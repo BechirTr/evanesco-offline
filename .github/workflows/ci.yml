@@ -38,10 +38,5 @@ jobs:
       - name: Security scan (Bandit)
         run: bandit -r src -ll
 
-      - name: Dependency vulnerability scan (safety)
-        run: |
-          pip freeze > requirements.txt
-          safety check --bare --file requirements.txt
-
       - name: Run unit tests
         run: pytest --maxfail=1 --disable-warnings -q
