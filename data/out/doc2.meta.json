@@ -1,0 +1,108 @@
+{
+  "pages": [
+    {
+      "page_index": 0,
+      "text": "Support Ticket Requester: Chen Wei Account #: 987654321 Email: c.wei@company.cn Alt Phone: +44 20 7946 0958 Address: 221B Baker Street, London NW1 6XE, UK",
+      "candidates": [
+        {
+          "label": "PERSON",
+          "start": 26,
+          "end": 34,
+          "text": "Chen Wei"
+        },
+        {
+          "label": "CARDINAL",
+          "start": 46,
+          "end": 55,
+          "text": "987654321"
+        },
+        {
+          "label": "GPE",
+          "start": 136,
+          "end": 142,
+          "text": "London"
+        },
+        {
+          "label": "GPE",
+          "start": 152,
+          "end": 154,
+          "text": "UK"
+        },
+        {
+          "label": "EMAIL",
+          "start": 63,
+          "end": 79,
+          "text": "c.wei@company.cn"
+        },
+        {
+          "label": "PHONE",
+          "start": 46,
+          "end": 55,
+          "text": "987654321"
+        },
+        {
+          "label": "PHONE",
+          "start": 91,
+          "end": 107,
+          "text": "+44 20 7946 0958"
+        }
+      ],
+      "llm_json": {
+        "items": [
+          {
+            "text": "Chen Wei",
+            "start": 26,
+            "end": 34,
+            "redact": true,
+            "category": "PERSON"
+          },
+          {
+            "text": "987654321",
+            "start": 46,
+            "end": 55,
+            "redact": true,
+            "category": "OTHER"
+          },
+          {
+            "text": "London",
+            "start": 136,
+            "end": 142,
+            "redact": false,
+            "category": "GPE"
+          },
+          {
+            "text": "UK",
+            "start": 152,
+            "end": 154,
+            "redact": false,
+            "category": "GPE"
+          },
+          {
+            "text": "c.wei@company.cn",
+            "start": 63,
+            "end": 79,
+            "redact": true,
+            "category": "EMAIL"
+          },
+          {
+            "text": "987654321",
+            "start": 46,
+            "end": 55,
+            "redact": true,
+            "category": "OTHER"
+          },
+          {
+            "text": "+44 20 7946 0958",
+            "start": 91,
+            "end": 107,
+            "redact": true,
+            "category": "PHONE"
+          }
+        ],
+        "notes": "The account number 987654321, though labeled as CARDINAL and PHONE, is treated as sensitive PII (category OTHER) and should be redacted. All location names are considered non‑PII."
+      },
+      "boxes_applied": 5
+    }
+  ],
+  "out": "data/out/doc2.pdf"
+}

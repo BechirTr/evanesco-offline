@@ -1,0 +1,120 @@
+Metadata-Version: 2.4
+Name: evanesco-offline
+Version: 0.1.0
+Summary: Fully local/offline document anonymization (OCR + spaCy/regex + optional Ollama GPT-OSS)
+Author: You
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: pillow>=10.0.0
+Requires-Dist: pdf2image>=1.17.0
+Requires-Dist: pytesseract>=0.3.10
+Requires-Dist: spacy>=3.7.2
+Requires-Dist: regex>=2024.5.15
+Requires-Dist: click>=8.1.7
+Requires-Dist: tqdm>=4.66.4
+Requires-Dist: python-dotenv>=1.0.1
+Requires-Dist: pydantic>=2.8.0
+Requires-Dist: rich>=13.7.1
+Requires-Dist: reportlab>=4.1.0
+Requires-Dist: img2pdf>=0.5.1
+Requires-Dist: numpy>=1.26.0
+Requires-Dist: opencv-python-headless>=4.9.0.80
+Requires-Dist: rapidfuzz>=3.9.0
+Requires-Dist: pymupdf>=1.24.8
+Requires-Dist: typer>=0.12.3
+Requires-Dist: orjson>=3.10.7
+Requires-Dist: requests>=2.32.3
+Requires-Dist: pandas>=2.3.2
+Requires-Dist: gradio>=4.44.0
+Requires-Dist: PyYAML>=6.0.1
+Provides-Extra: docs
+Requires-Dist: sphinx>=7.0.0; extra == "docs"
+Requires-Dist: myst-parser>=2.0.0; extra == "docs"
+Requires-Dist: sphinx-autodoc-typehints>=2.2.1; extra == "docs"
+Requires-Dist: sphinx-rtd-theme>=2.0.0; extra == "docs"
+Provides-Extra: server
+Requires-Dist: fastapi>=0.111.0; extra == "server"
+Requires-Dist: uvicorn>=0.30.0; extra == "server"
+Requires-Dist: prometheus-client>=0.20.0; extra == "server"
+Provides-Extra: nlp
+Requires-Dist: langdetect>=1.0.9; extra == "nlp"
+
+# Evanesco (Offline)
+
+Fully local, offline document anonymization / PII redaction pipeline.
+
+- **OCR**: pdf2image + Tesseract (via `pytesseract`) with per-word bounding boxes (TSV).
+- **Detection**: hybrid rules — spaCy NER (offline models), deterministic regexes (emails, phones, IBAN, SSN-like), and optional LLM confirmation via **Ollama** (local HTTP, e.g., `gpt-oss:20b`).
+- **Redaction**: image-based black boxes drawn over the OCR bounding boxes, then re-assembled into a redacted PDF while preserving the document's visual layout (forms included).
+- **Reproducible**: config-driven, deterministic by default. LLM step can be disabled.
+- **No cloud calls**: stays on your machine.
+
+## System requirements
+
+- Python 3.10+
+- **Tesseract** installed and in PATH.
+- **poppler** installed for `pdf2image` (for PDF rasterization).
+- Optional: **Ollama** with a local model (e.g., `gpt-oss:20b`).
+- Optional: spaCy model installed offline, e.g.:
+  ```bash
+  python -m spacy download en_core_web_lg
+  ```
+
+## Quickstart
+
+```bash
+# 1) Install
+pip install -e .
+
+# 2) Set configs (optional)
+cp configs/example.yaml configs/local.yaml
+
+# 3) Run
+evanesco run --input data/in/sample.pdf --output data/out/sample_redacted.pdf --spacy-model en_core_web_lg --use-llm false
+
+# Variants
+# Single image
+evanesco run -i data/in/photo.jpg -o data/out/photo_redacted.pdf
+
+# Directory of images (alphabetical order)
+evanesco run -i data/in/batch_images -o data/out/batch_redacted.pdf
+```
+
+## CLI
+
+- `evanesco run` — process a file or directory of PDFs/images.
+- `evanesco eval` — evaluate redaction quality given ground-truth JSON.
+- `evanesco ui` or `evanesco-ui` — launch the Gradio UI.
+
+## UI
+
+Launch a local web UI with Gradio to upload documents and tune parameters:
+
+```bash
+evanesco ui --host 0.0.0.0 --port 7860
+# or
+evanesco-ui
+```
+
+## Documentation
+
+Sphinx documentation with API reference is available under `docs/`.
+
+```bash
+pip install .[docs]
+sphinx-build -b html docs docs/_build
+open docs/_build/index.html
+```
+
+## Notes
+
+- Redaction is **image-based** for robustness and layout fidelity. We overlay rectangles on detected PII words/lines and export a redacted PDF using `img2pdf`. For exact text redaction in vector PDFs, integrate `PyMuPDF` search on the original PDF text layer when available.
+- The Ollama step adds a light-weight "human-like" confirmation (e.g., ambiguous names). You can keep it fully deterministic by disabling it.
+
+## Enterprise Features
+
+- Policies: built-in `default`, `gdpr`, `hipaa`, `pci` or custom YAML via `--policy`.
+- Audit: per-run audit JSON with input/output hashes; optional HMAC via `EVANESCO_HMAC_KEY`.
+- Pseudonymization: `--mode label` overlays category tags instead of pure blackout.
+- Batch: `evanesco batch` processes many files concurrently.
+- API: `evanesco-api` (FastAPI) exposes `/redact` and `/health`, with `/metrics` when `prometheus-client` is installed.

@@ -1,0 +1,16 @@
+name: gdpr
+metadata:
+  jurisdiction: EU
+  description: GDPR-aligned PII categories
+allowed_categories:
+  - PERSON
+  - ORG
+  - GPE
+  - LOC
+  - DATE
+  - EMAIL
+  - PHONE
+  - IBAN
+  - CREDIT_CARD
+default_redact: true
+

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>evanesco.redact &mdash; Evanesco Offline 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=01f34227"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="evanesco.regex_detect" href="evanesco.regex_detect.html" />
+    <link rel="prev" title="evanesco.policy" href="evanesco.policy.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Evanesco Offline
+          </a>
+              <div class="version">
+                0.1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../architecture.html">Architecture</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="evanesco.html">evanesco</a></li>
+<li class="toctree-l2"><a class="reference internal" href="evanesco.core.html">evanesco.core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="evanesco.ocr.html">evanesco.ocr</a></li>
+<li class="toctree-l2"><a class="reference internal" href="evanesco.spacy_detect.html">evanesco.spacy_detect</a></li>
+<li class="toctree-l2"><a class="reference internal" href="evanesco.regex_detect.html">evanesco.regex_detect</a></li>
+<li class="toctree-l2"><a class="reference internal" href="evanesco.align.html">evanesco.align</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">evanesco.redact</a></li>
+<li class="toctree-l2"><a class="reference internal" href="evanesco.ollama_client.html">evanesco.ollama_client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="evanesco.llm.html">evanesco.llm</a></li>
+<li class="toctree-l2"><a class="reference internal" href="evanesco.cli.html">evanesco.cli</a></li>
+<li class="toctree-l2"><a class="reference internal" href="evanesco.ui.html">evanesco.ui</a></li>
+<li class="toctree-l2"><a class="reference internal" href="evanesco.api.html">evanesco.api</a></li>
+<li class="toctree-l2"><a class="reference internal" href="evanesco.batch.html">evanesco.batch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="evanesco.policy.html">evanesco.policy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="evanesco.audit.html">evanesco.audit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="evanesco.logging.html">evanesco.logging</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Evanesco Offline</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="evanesco.html">evanesco</a></li>
+      <li class="breadcrumb-item active">evanesco.redact</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/api/_autosummary/evanesco.redact.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-evanesco.redact">
+<span id="evanesco-redact"></span><h1>evanesco.redact<a class="headerlink" href="#module-evanesco.redact" title="Link to this heading"></a></h1>
+<p>Redaction routines.</p>
+<p>Provides utilities to draw opaque rectangles over detected PII regions and to
+export a set of page images back to a compact PDF while preserving layout.</p>
+<p class="rubric">Functions</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">draw_preview</span></code>(img, kept, rejected, *[, ...])</p></td>
+<td><p>Draw outline boxes for QA preview: green=kept, red=rejected.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">redact_page</span></code>(img, boxes[, fill_rgb, inflate_px])</p></td>
+<td><p>Draw filled rectangles over PII regions on a copy of the image.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">redact_page_with_labels</span></code>(img, box_infos[, ...])</p></td>
+<td><p>Redact with solid boxes and overlay pseudonym labels.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">save_pdf</span></code>(images, out_path)</p></td>
+<td><p>Save a list of PIL images as a compact PDF.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="evanesco.policy.html" class="btn btn-neutral float-left" title="evanesco.policy" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="evanesco.regex_detect.html" class="btn btn-neutral float-right" title="evanesco.regex_detect" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Evanesco contributors.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

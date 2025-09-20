@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: evanesco-api
+  labels:
+    app.kubernetes.io/name: evanesco
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: evanesco
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: evanesco
+    app.kubernetes.io/component: api
+  ports:
+    - name: http
+      port: 8000
+      targetPort: http

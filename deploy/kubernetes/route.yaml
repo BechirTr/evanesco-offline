@@ -1,0 +1,17 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: evanesco-api
+  labels:
+    app.kubernetes.io/name: evanesco
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: evanesco
+spec:
+  to:
+    kind: Service
+    name: evanesco-api
+    weight: 100
+  port:
+    targetPort: http
+  tls:
+    termination: edge

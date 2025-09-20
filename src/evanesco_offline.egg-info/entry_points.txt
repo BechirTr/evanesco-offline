@@ -1,0 +1,4 @@
+[console_scripts]
+evanesco = evanesco.cli:app
+evanesco-api = evanesco.api:run
+evanesco-ui = evanesco.ui:launch

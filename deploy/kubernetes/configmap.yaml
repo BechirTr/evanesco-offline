@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: evanesco-config
+  labels:
+    app.kubernetes.io/name: evanesco
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: evanesco
+data:
+  EVANESCO_API_HOST: "0.0.0.0"
+  EVANESCO_API_CORS_ORIGINS: "https://evanesco-ui.example.com"
+  EVANESCO_READY_CHECK_OCR: "true"
+  EVANESCO_READY_CHECK_SPACY: "true"
+  EVANESCO_READY_CHECK_LLM: "false"
+  EVANESCO_READY_SPACY_MODEL: "en_core_web_lg"
+  EVANESCO_READY_TESS_LANGS: "eng"
+  EVANESCO_READY_WARN_ONLY: "true"

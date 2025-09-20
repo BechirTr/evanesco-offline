@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Usage &mdash; Evanesco Offline 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=01f34227"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Architecture" href="architecture.html" />
+    <link rel="prev" title="Evanesco Offline" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Evanesco Offline
+          </a>
+              <div class="version">
+                0.1.0
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Guide</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#command-line">Command-line</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#python-api">Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#policies">Policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pseudonymization-mode">Pseudonymization Mode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#batch-processing">Batch Processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#rest-api">REST API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#llm-explainability">LLM Explainability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#visual-previews">Visual Previews</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#full-llm-traces-optional">Full LLM Traces (optional)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#performance-monitoring">Performance Monitoring</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#audit-and-integrity">Audit and Integrity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#troubleshooting-spacy-model-not-found">Troubleshooting: spaCy model not found</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#llm-ner-few-shot">LLM NER (Few-shot)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/index.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Evanesco Offline</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Usage</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/usage.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="usage">
+<h1>Usage<a class="headerlink" href="#usage" title="Link to this heading"></a></h1>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
+<p>Use a modern Python (&gt;=3.10) and install via <code class="docutils literal notranslate"><span class="pre">pip</span></code> in a virtualenv. Poppler is
+recommended for PDF rasterization.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">.</span>
+<span class="c1"># Optional: docs build dependencies</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="o">.</span><span class="p">[</span><span class="n">docs</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Dependencies you may need:</p>
+<ul class="simple">
+<li><p>Poppler (for pdf2image): macOS <code class="docutils literal notranslate"><span class="pre">brew</span> <span class="pre">install</span> <span class="pre">poppler</span></code>, Debian/Ubuntu <code class="docutils literal notranslate"><span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">poppler-utils</span></code></p></li>
+<li><p>Tesseract OCR: macOS <code class="docutils literal notranslate"><span class="pre">brew</span> <span class="pre">install</span> <span class="pre">tesseract</span></code>, Debian/Ubuntu <code class="docutils literal notranslate"><span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">tesseract-ocr</span></code></p></li>
+<li><p>Optional: PyMuPDF (<code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">pymupdf</span></code>) as a fallback when Poppler is not available</p></li>
+</ul>
+</section>
+<section id="command-line">
+<h2>Command-line<a class="headerlink" href="#command-line" title="Link to this heading"></a></h2>
+<p>Redact a PDF or image:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">evanesco</span> <span class="n">run</span> <span class="o">-</span><span class="n">i</span> <span class="n">data</span><span class="o">/</span><span class="ow">in</span><span class="o">/</span><span class="n">pii_basic</span><span class="o">.</span><span class="n">pdf</span> <span class="o">-</span><span class="n">o</span> <span class="n">data</span><span class="o">/</span><span class="n">out</span><span class="o">/</span><span class="n">redacted</span><span class="o">.</span><span class="n">pdf</span> \
+  <span class="o">--</span><span class="n">use</span><span class="o">-</span><span class="n">llm</span> <span class="kc">True</span> <span class="o">--</span><span class="n">spacy</span><span class="o">-</span><span class="n">model</span> <span class="n">en_core_web_lg</span>
+</pre></div>
+</div>
+<p>Launch the web UI:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">evanesco</span> <span class="n">ui</span> <span class="o">--</span><span class="n">host</span> <span class="mf">0.0.0.0</span> <span class="o">--</span><span class="n">port</span> <span class="mi">7860</span>
+<span class="c1"># or</span>
+<span class="n">evanesco</span><span class="o">-</span><span class="n">ui</span>
+<span class="c1"># or (uses the exact Python of your venv)</span>
+<span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">evanesco</span><span class="o">.</span><span class="n">cli</span> <span class="n">ui</span> <span class="o">--</span><span class="n">host</span> <span class="mf">0.0.0.0</span> <span class="o">--</span><span class="n">port</span> <span class="mi">7860</span>
+</pre></div>
+</div>
+<p>The UI can also generate review CSVs (candidates and boxes) to support
+human-in-the-loop workflows.</p>
+</section>
+<section id="python-api">
+<h2>Python API<a class="headerlink" href="#python-api" title="Link to this heading"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">evanesco.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">RunConfig</span><span class="p">,</span> <span class="n">process_path</span>
+
+<span class="n">cfg</span> <span class="o">=</span> <span class="n">RunConfig</span><span class="p">(</span><span class="n">use_llm</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">spacy_model</span><span class="o">=</span><span class="s2">&quot;en_core_web_lg&quot;</span><span class="p">)</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">process_path</span><span class="p">(</span><span class="s2">&quot;input.pdf&quot;</span><span class="p">,</span> <span class="s2">&quot;output.redacted.pdf&quot;</span><span class="p">,</span> <span class="n">cfg</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="s2">&quot;out&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</section>
+<section id="policies">
+<h2>Policies<a class="headerlink" href="#policies" title="Link to this heading"></a></h2>
+<p>Use a built-in policy or provide a custom YAML:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">evanesco</span> <span class="n">run</span> <span class="o">-</span><span class="n">i</span> <span class="nb">input</span><span class="o">.</span><span class="n">pdf</span> <span class="o">-</span><span class="n">o</span> <span class="n">out</span><span class="o">.</span><span class="n">pdf</span> <span class="o">--</span><span class="n">policy</span> <span class="n">gdpr</span>
+<span class="c1"># or</span>
+<span class="n">evanesco</span> <span class="n">run</span> <span class="o">-</span><span class="n">i</span> <span class="nb">input</span><span class="o">.</span><span class="n">pdf</span> <span class="o">-</span><span class="n">o</span> <span class="n">out</span><span class="o">.</span><span class="n">pdf</span> <span class="o">--</span><span class="n">policy</span> <span class="n">configs</span><span class="o">/</span><span class="n">policies</span><span class="o">/</span><span class="n">custom</span><span class="o">.</span><span class="n">yaml</span>
+</pre></div>
+</div>
+<p>YAML example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">name</span><span class="p">:</span> <span class="n">custom</span>
+<span class="n">allowed_categories</span><span class="p">:</span> <span class="p">[</span><span class="n">PERSON</span><span class="p">,</span> <span class="n">EMAIL</span><span class="p">,</span> <span class="n">PHONE</span><span class="p">]</span>
+<span class="n">default_redact</span><span class="p">:</span> <span class="n">true</span>
+</pre></div>
+</div>
+</section>
+<section id="pseudonymization-mode">
+<h2>Pseudonymization Mode<a class="headerlink" href="#pseudonymization-mode" title="Link to this heading"></a></h2>
+<p>Overlay category labels instead of pure black boxes:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">evanesco</span> <span class="n">run</span> <span class="o">-</span><span class="n">i</span> <span class="nb">input</span><span class="o">.</span><span class="n">pdf</span> <span class="o">-</span><span class="n">o</span> <span class="n">out</span><span class="o">.</span><span class="n">pdf</span> <span class="o">--</span><span class="n">mode</span> <span class="n">label</span>
+</pre></div>
+</div>
+</section>
+<section id="batch-processing">
+<h2>Batch Processing<a class="headerlink" href="#batch-processing" title="Link to this heading"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">evanesco</span> <span class="n">batch</span> <span class="o">--</span><span class="nb">input</span><span class="o">-</span><span class="nb">dir</span> <span class="n">data</span><span class="o">/</span><span class="ow">in</span> <span class="o">--</span><span class="n">output</span><span class="o">-</span><span class="nb">dir</span> <span class="n">data</span><span class="o">/</span><span class="n">out</span> <span class="o">--</span><span class="n">workers</span> <span class="mi">4</span>
+
+<span class="c1">## OCR Tuning</span>
+
+<span class="n">Hard</span> <span class="n">scans</span> <span class="n">benefit</span> <span class="kn">from</span><span class="w"> </span><span class="nn">higher</span> <span class="n">DPI</span> <span class="p">(</span><span class="n">default</span> <span class="mi">400</span><span class="p">),</span> <span class="n">preprocessing</span><span class="p">,</span> <span class="n">deskew</span> <span class="ow">and</span>
+<span class="n">auto</span><span class="o">-</span><span class="n">PSM</span> <span class="n">retries</span><span class="o">.</span> <span class="n">These</span> <span class="n">are</span> <span class="n">enabled</span> <span class="n">by</span> <span class="n">default</span> <span class="ow">and</span> <span class="n">can</span> <span class="n">be</span> <span class="n">toggled</span><span class="p">:</span>
+
+</pre></div>
+</div>
+<p>evanesco run -i input.pdf -o out.pdf <br />
+–preprocess/–no-preprocess <br />
+–deskew/–no-deskew <br />
+–binarize/–no-binarize <br />
+–auto-psm/–no-auto-psm <br />
+–dpi 450 –psm 6</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</section>
+<section id="rest-api">
+<h2>REST API<a class="headerlink" href="#rest-api" title="Link to this heading"></a></h2>
+<p>Install server extras and run the API:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">.</span><span class="p">[</span><span class="n">server</span><span class="p">]</span>
+<span class="n">evanesco</span><span class="o">-</span><span class="n">api</span> <span class="o">--</span><span class="n">host</span> <span class="mf">0.0.0.0</span> <span class="o">--</span><span class="n">port</span> <span class="mi">8000</span>
+</pre></div>
+</div>
+<p>Call the endpoint:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">curl</span> <span class="o">-</span><span class="n">F</span> <span class="s2">&quot;file=@data/in/pii_basic.pdf&quot;</span> <span class="o">-</span><span class="n">o</span> <span class="n">redacted</span><span class="o">.</span><span class="n">pdf</span> \
+  <span class="o">-</span><span class="n">F</span> <span class="s2">&quot;policy=default&quot;</span> <span class="o">-</span><span class="n">F</span> <span class="s2">&quot;mode=redact&quot;</span> \
+  <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">localhost</span><span class="p">:</span><span class="mi">8000</span><span class="o">/</span><span class="n">redact</span>
+</pre></div>
+</div>
+<p>Prometheus metrics are available at <code class="docutils literal notranslate"><span class="pre">/metrics</span></code> when <code class="docutils literal notranslate"><span class="pre">prometheus-client</span></code> is installed.</p>
+</section>
+<section id="llm-explainability">
+<h2>LLM Explainability<a class="headerlink" href="#llm-explainability" title="Link to this heading"></a></h2>
+<p>When LLM confirmation is enabled, Evanesco captures per-item explanations and timing metrics:</p>
+<ul class="simple">
+<li><p>Each item includes: <code class="docutils literal notranslate"><span class="pre">text</span></code>, <code class="docutils literal notranslate"><span class="pre">start</span></code>, <code class="docutils literal notranslate"><span class="pre">end</span></code>, <code class="docutils literal notranslate"><span class="pre">category</span></code>, <code class="docutils literal notranslate"><span class="pre">redact</span></code>, <code class="docutils literal notranslate"><span class="pre">why</span></code>, <code class="docutils literal notranslate"><span class="pre">score</span></code>.</p></li>
+<li><p>Per-page metadata includes model and basic timing counts from the LLM backend.</p></li>
+<li><p>The UI has an “LLM Explainability” panel showing the extracted items.</p></li>
+<li><p>Review CSVs include an <code class="docutils literal notranslate"><span class="pre">llm_items.csv</span></code> with the same fields.</p></li>
+</ul>
+<p>Notes:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">EVANESCO_DEBUG=1</span></code> adds more loader details and can help troubleshooting.</p></li>
+<li><p>Prompts are summarized in the metadata via short excerpts; full prompts can be reconstructed from the run inputs.</p></li>
+</ul>
+</section>
+<section id="visual-previews">
+<h2>Visual Previews<a class="headerlink" href="#visual-previews" title="Link to this heading"></a></h2>
+<p>Enable preview overlays (kept=green, rejected=red) in the UI under “Review &amp; Artifacts”.
+Use the page slider to browse per-page QA images. Previews are also saved next to
+the output under a <code class="docutils literal notranslate"><span class="pre">.previews</span></code> folder.</p>
+</section>
+<section id="full-llm-traces-optional">
+<h2>Full LLM Traces (optional)<a class="headerlink" href="#full-llm-traces-optional" title="Link to this heading"></a></h2>
+<p>For deep audits, enable “Save full LLM traces” in the UI to write one JSON per
+page containing the full prompt and raw LLM response in a <code class="docutils literal notranslate"><span class="pre">.traces</span></code> folder
+alongside the output PDF.</p>
+</section>
+<section id="performance-monitoring">
+<h2>Performance Monitoring<a class="headerlink" href="#performance-monitoring" title="Link to this heading"></a></h2>
+<p>The UI exposes a “Performance” panel with per-stage timings (OCR, detect, LLM,
+align, redact) and averages across pages. Use this to spot bottlenecks.</p>
+</section>
+<section id="audit-and-integrity">
+<h2>Audit and Integrity<a class="headerlink" href="#audit-and-integrity" title="Link to this heading"></a></h2>
+<p>Every run writes an audit JSON next to the output PDF with input/output hashes,
+config snapshot, and page summaries. To add a tamper-evident signature, set an
+HMAC key:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">export</span> <span class="n">EVANESCO_HMAC_KEY</span><span class="o">=</span><span class="s2">&quot;a-strong-secret&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="troubleshooting-spacy-model-not-found">
+<h2>Troubleshooting: spaCy model not found<a class="headerlink" href="#troubleshooting-spacy-model-not-found" title="Link to this heading"></a></h2>
+<p>If you see a warning about <code class="docutils literal notranslate"><span class="pre">en_core_web_lg</span></code> not found while the model is
+installed, it means the running Python is not your venv’s interpreter.</p>
+<ul class="simple">
+<li><p>Verify the interpreter: <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-c</span> <span class="pre">&quot;import</span> <span class="pre">sys;</span> <span class="pre">print(sys.executable)&quot;</span></code></p></li>
+<li><p>Verify the <code class="docutils literal notranslate"><span class="pre">evanesco</span></code> script is from your venv: <code class="docutils literal notranslate"><span class="pre">which</span> <span class="pre">evanesco</span></code></p></li>
+<li><p>Prefer launching the UI with your venv’s Python:
+<code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">evanesco.cli</span> <span class="pre">ui</span> <span class="pre">--host</span> <span class="pre">0.0.0.0</span> <span class="pre">--port</span> <span class="pre">7860</span></code></p></li>
+<li><p>Enable debug details: <code class="docutils literal notranslate"><span class="pre">EVANESCO_DEBUG=1</span> <span class="pre">...</span></code></p></li>
+<li><p>As a workaround, pass the model by path in the UI or CLI <code class="docutils literal notranslate"><span class="pre">--spacy-model</span></code>.</p></li>
+</ul>
+</section>
+<section id="llm-ner-few-shot">
+<h2>LLM NER (Few-shot)<a class="headerlink" href="#llm-ner-few-shot" title="Link to this heading"></a></h2>
+<p>Use the LLM to extract entities with a few-shot prompt instead of spaCy:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">evanesco</span> <span class="n">run</span> <span class="o">-</span><span class="n">i</span> <span class="nb">input</span><span class="o">.</span><span class="n">pdf</span> <span class="o">-</span><span class="n">o</span> <span class="n">out</span><span class="o">.</span><span class="n">pdf</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">use</span><span class="o">-</span><span class="n">spacy</span> <span class="o">--</span><span class="n">use</span><span class="o">-</span><span class="n">llm</span><span class="o">-</span><span class="n">ner</span> \
+  <span class="o">--</span><span class="n">llm</span><span class="o">-</span><span class="n">ner</span><span class="o">-</span><span class="n">prompt</span> <span class="n">src</span><span class="o">/</span><span class="n">prompts</span><span class="o">/</span><span class="n">ner_fewshot</span><span class="o">.</span><span class="n">jsonl</span>
+</pre></div>
+</div>
+<p>In the UI, enable “Use LLM NER (few-shot instead of spaCy)” and optionally
+provide a prompt path. The system falls back to a built-in prompt if none is
+provided.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Evanesco Offline" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="architecture.html" class="btn btn-neutral float-right" title="Architecture" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Evanesco contributors.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,31 @@
+{
+  "pages": [
+    {
+      "page_index": 0,
+      "text": "Support Ticket Requester: Chen Wei Account #: 987654321 Email: c.wei@company.cn Alt Phone: +44 20 7946 0958 Address: 221B Baker Street, London NW1 6XE, UK",
+      "candidates": [
+        {
+          "label": "EMAIL",
+          "start": 63,
+          "end": 79,
+          "text": "c.wei@company.cn"
+        },
+        {
+          "label": "PHONE",
+          "start": 46,
+          "end": 55,
+          "text": "987654321"
+        },
+        {
+          "label": "PHONE",
+          "start": 91,
+          "end": 107,
+          "text": "+44 20 7946 0958"
+        }
+      ],
+      "llm_json": null,
+      "boxes_applied": 3
+    }
+  ],
+  "out": "data/out/doc.pdf"
+}

@@ -1,0 +1,33 @@
+# Example config for Evanesco
+ocr:
+  lang: "eng"
+  psm: 3        # default page segmentation mode
+  dpi: 300
+  whitelist: "" # optional tesseract character whitelist
+  blacklist: ""
+
+detection:
+  use_spacy: true
+  spacy_model: "en_core_web_lg"
+  use_regex: true
+  use_llm: false
+  llm_model: "gpt-oss:20b"   # ollama model name
+  llm_url: "http://localhost:11434/api/generate"
+  categories:
+    - PERSON
+    - ORG
+    - GPE
+    - LOC
+    - DATE
+    - EMAIL
+    - PHONE
+    - IBAN
+    - CREDIT_CARD
+
+redaction:
+  box_inflation_px: 2
+  fill_rgb: [0, 0, 0]
+  keep_ocr_text: false
+
+io:
+  overwrite: true

@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Evanesco Offline — Pipeline Architecture</title>
+    <style>
+      :root { color-scheme: light dark; }
+      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; margin: 24px; line-height: 1.35; }
+      h1 { font-size: 1.6rem; margin: 0 0 0.75rem 0; }
+      p.note { color: #666; max-width: 900px; }
+      .wrap { max-width: 1200px; }
+      .mermaid { border: 1px solid #ddd; border-radius: 8px; padding: 8px; }
+      code { background: rgba(127,127,127,0.12); padding: 0.2em 0.35em; border-radius: 4px; }
+    </style>
+    <!-- Mermaid via ESM CDN; requires internet when viewing. -->
+    <script type="module">
+      import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+      mermaid.initialize({ startOnLoad: true, theme: 'neutral', securityLevel: 'loose' });
+    </script>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>Evanesco Offline — Pipeline Architecture</h1>
+      <p class="note">
+        End‑to‑end dataflow of the local PII redaction pipeline (OCR + spaCy/regex + optional Ollama) with layout‑preserving PDF output.
+        If viewing fully offline, load Mermaid locally or paste the graph content into a Mermaid‑enabled editor.
+      </p>
+
+      <div class="mermaid">
+graph TD
+  %% Minimal styles
+  classDef external fill:#f3f3f3,stroke:#888,color:#222
+  classDef action fill:#e8f1ff,stroke:#4a90e2,color:#111
+  classDef store fill:#fff1e0,stroke:#e67e22,color:#333
+
+  %% Entry / Config
+  I[CLI evanesco run]:::external --> Cfg[RunConfig]:::store
+  I --> InPath[Input Path]
+
+  subgraph Ingestion
+    InPath -->|PDF| Raster{Rasterize}
+    InPath -->|Images| ImgList[Page Images]:::store
+    Raster -->|pdf2image Poppler| ImgList
+    Raster -->|PyMuPDF fallback| ImgList
+  end
+
+  subgraph PerPagePipeline
+    direction LR
+    ImgList --> OCR[Tesseract OCR]:::action
+    OCR --> Text[Reconstruct Text]:::action
+    Text --> Spa[spaCy NER]:::action
+    Text --> Re[Regex patterns]:::action
+    Spa --> Cand[Candidates]:::store
+    Re  --> Cand
+
+    Cand -->|optional| LLM[Ollama gpt_oss_20b]:::action
+    LLM --> Dec[LLM Decisions]:::store
+    Cand -->|no LLM| Final[Final Spans]:::store
+    Dec  --> Final
+
+    OCR  --> Align[Align spans to OCR boxes]:::action
+    Final --> Align
+    Align --> Boxes[PII Boxes]:::store
+    Boxes --> Redact[Draw boxes]:::action
+    Redact --> RedPages[Redacted Pages]:::store
+  end
+
+  subgraph Output
+    RedPages --> PDF[img2pdf Redacted PDF]:::action
+    Cand --> Meta[meta json]:::store
+  end
+
+  subgraph ServicesDeps
+    T[Tesseract]:::external
+    Pop[Poppler]:::external
+    Oll[Ollama Server]:::external
+  end
+
+  OCR --- T
+  Raster --- Pop
+  LLM --- Oll
+      </div>
+
+      <p class="note">
+        Notes:
+        <br/>• Set <code>POPPLER_PATH</code> if Poppler binaries aren’t on PATH. If Poppler is unavailable, the pipeline falls back to <code>PyMuPDF</code>.
+        <br/>• spaCy model resolution tries requested name → <code>en_core_web_sm</code> → <code>spacy.blank('en')</code>; also supports direct package import.
+        <br/>• LLM step reads a prompt from <code>--prompt-path</code> or auto-discovers <code>prompts/pii_audit.jsonl</code>, with a built‑in minimal fallback.
+      </p>
+    </div>
+  </body>
+  
+</html>

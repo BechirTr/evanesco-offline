@@ -1,0 +1,204 @@
+---
+title: Usage
+---
+
+# Usage
+
+## Installation
+
+Use a modern Python (>=3.10) and install via `pip` in a virtualenv. Poppler is
+recommended for PDF rasterization.
+
+```
+pip install .
+# Optional: docs build dependencies
+pip install .[docs]
+```
+
+Dependencies you may need:
+
+- Poppler (for pdf2image): macOS `brew install poppler`, Debian/Ubuntu `apt-get install poppler-utils`
+- Tesseract OCR: macOS `brew install tesseract`, Debian/Ubuntu `apt-get install tesseract-ocr`
+- Optional: PyMuPDF (`pip install pymupdf`) as a fallback when Poppler is not available
+
+## Command-line
+
+Redact a PDF or image:
+
+```
+evanesco run -i data/in/pii_basic.pdf -o data/out/redacted.pdf \
+  --use-llm True --spacy-model en_core_web_lg
+```
+
+Launch the web UI:
+
+```
+evanesco ui --host 0.0.0.0 --port 7860
+# or
+evanesco-ui
+# or (uses the exact Python of your venv)
+python -m evanesco.cli ui --host 0.0.0.0 --port 7860
+```
+
+The UI can also generate review CSVs (candidates and boxes) to support
+human-in-the-loop workflows.
+
+## Python API
+
+```python
+from evanesco.core import RunConfig, process_path
+
+cfg = RunConfig(use_llm=False, spacy_model="en_core_web_lg")
+res = process_path("input.pdf", "output.redacted.pdf", cfg)
+print(res["out"])
+```
+
+## Policies
+
+Use a built-in policy or provide a custom YAML:
+
+```
+evanesco run -i input.pdf -o out.pdf --policy gdpr
+# or
+evanesco run -i input.pdf -o out.pdf --policy configs/policies/custom.yaml
+```
+
+YAML example:
+
+```
+name: custom
+allowed_categories: [PERSON, EMAIL, PHONE]
+default_redact: true
+```
+
+## Pseudonymization Mode
+
+Overlay category labels instead of pure black boxes:
+
+```
+evanesco run -i input.pdf -o out.pdf --mode label
+```
+
+## Batch Processing
+
+```
+evanesco batch --input-dir data/in --output-dir data/out --workers 4
+
+## OCR Tuning
+
+Hard scans benefit from higher DPI (default 400), preprocessing, deskew and
+auto-PSM retries. These are enabled by default and can be toggled:
+
+```
+evanesco run -i input.pdf -o out.pdf \
+  --preprocess/--no-preprocess \
+  --deskew/--no-deskew \
+  --binarize/--no-binarize \
+  --auto-psm/--no-auto-psm \
+  --dpi 450 --psm 6
+```
+
+## Multilingual (French)
+
+spaCy supports many languages including French. For French documents:
+
+- Install the French spaCy model: `python -m spacy download fr_core_news_lg`
+- Ensure Tesseract has French language data (usually `fra`); on Debian/Ubuntu: `apt-get install tesseract-ocr-fra`
+- Run with French OCR language and model:
+
+```
+evanesco run -i input.pdf -o out.pdf --lang fra --spacy-model fr_core_news_lg
+```
+
+You can also let the CLI pick a model based on `--lang` by using auto:
+
+```
+evanesco run -i input.pdf -o out.pdf --lang fra --spacy-model auto
+```
+
+In the UI, set “Tesseract language” to `fra` and “spaCy model” to `fr_core_news_lg`.
+```
+
+## REST API
+
+Install server extras and run the API:
+
+```
+pip install .[server]
+evanesco-api --host 0.0.0.0 --port 8000
+```
+
+Call the endpoint:
+
+```
+curl -F "file=@data/in/pii_basic.pdf" -o redacted.pdf \
+  -F "policy=default" -F "mode=redact" \
+  http://localhost:8000/redact
+```
+
+Prometheus metrics are available at `/metrics` when `prometheus-client` is installed.
+
+## LLM Explainability
+
+When LLM confirmation is enabled, Evanesco captures per-item explanations and timing metrics:
+
+- Each item includes: `text`, `start`, `end`, `category`, `redact`, `why`, `score`.
+- Per-page metadata includes model and basic timing counts from the LLM backend.
+- The UI has an "LLM Explainability" panel showing the extracted items.
+- Review CSVs include an `llm_items.csv` with the same fields.
+
+Notes:
+- `EVANESCO_DEBUG=1` adds more loader details and can help troubleshooting.
+- Prompts are summarized in the metadata via short excerpts; full prompts can be reconstructed from the run inputs.
+
+## Visual Previews
+
+Enable preview overlays (kept=green, rejected=red) in the UI under "Review & Artifacts".
+Use the page slider to browse per-page QA images. Previews are also saved next to
+the output under a `.previews` folder.
+
+## Full LLM Traces (optional)
+
+For deep audits, enable "Save full LLM traces" in the UI to write one JSON per
+page containing the full prompt and raw LLM response in a `.traces` folder
+alongside the output PDF.
+
+## Performance Monitoring
+
+The UI exposes a "Performance" panel with per-stage timings (OCR, detect, LLM,
+align, redact) and averages across pages. Use this to spot bottlenecks.
+
+## Audit and Integrity
+
+Every run writes an audit JSON next to the output PDF with input/output hashes,
+config snapshot, and page summaries. To add a tamper-evident signature, set an
+HMAC key:
+
+```
+export EVANESCO_HMAC_KEY="a-strong-secret"
+```
+
+## Troubleshooting: spaCy model not found
+
+If you see a warning about `en_core_web_lg` not found while the model is
+installed, it means the running Python is not your venv’s interpreter.
+
+- Verify the interpreter: `python -c "import sys; print(sys.executable)"`
+- Verify the `evanesco` script is from your venv: `which evanesco`
+- Prefer launching the UI with your venv’s Python:
+  `python -m evanesco.cli ui --host 0.0.0.0 --port 7860`
+- Enable debug details: `EVANESCO_DEBUG=1 ...`
+- As a workaround, pass the model by path in the UI or CLI `--spacy-model`.
+
+## LLM NER (Few-shot)
+
+Use the LLM to extract entities with a few-shot prompt instead of spaCy:
+
+```
+evanesco run -i input.pdf -o out.pdf --no-use-spacy --use-llm-ner \
+  --llm-ner-prompt src/prompts/ner_fewshot.jsonl
+```
+
+In the UI, enable "Use LLM NER (few-shot instead of spaCy)" and optionally
+provide a prompt path. The system falls back to a built-in prompt if none is
+provided.

@@ -1,0 +1,711 @@
+{
+  "pages": [
+    {
+      "page_index": 0,
+      "text": "Apollo Diagnostic Form DF-196 Health System APOLLO PATHOLOGY ASSOCIATES, INC CHRISTIAN CHURCH CITY HOSPITAL DEPARTMENT OF PATHOLOGY 742 Main Avenue AND ARTIFICLAL SCIENCE Toledo, OH 43615 (419) 555-8923 FINAL PATIENT SUMMARY REPORT     PATIENT NAME: Jonathan Miller MRN: 4829746 DOB: 07/15/2005 20Y Female BILLING NO: 8646139 LOCATION: Wisconsin PROCEDURE DATE: 04/24/2025 RGEON: Steven Walker RECEIVED DATE: 04/26/2025 4 DOCTOR: Joseph Smith REPORT DATE: MY28/2025 DIAGNOSIS: Type 2 Diabetes Mellitus DOCTOR NOTES: Patient reports feeling well-controlled. No significant complaints. Reports adherence to medication regimen.Patient with Type 2 Diabetes Mellitus, well-controlled on current medication regimen. Lipid pane! and HbAlc within target range. No new concems reported.Continue current medication regimen. Encourage adherence to Diabetic-friendly diet and moderate exercise. PATIENT SUMMARY: nathan Miller, born on 15/07/2005, is a 20-year-old female patient. The patient has a history of Type 2 I} Diabetes Mellitus and is currently undergoing management and monitoring. Regular blood glucose checks and lifestyle modifications are advised to maintain optimal health. The patients condition remains stable with ongoing care. PATIENT LIFESTYLE AND VITALS: Smoking Status: Never Alcohol Consumption: Rarely Diet Preference: Diabetic-friendly Exercise Habits: Mild Heart Rate: 72 Respiratory Rate: 16 Pemperaure Celsius: 36.6 {J Oxygen Saturation Percent: 98 Blood Pressure: 128/78 mmHg Recorded Date: 03/11/2024 DEPARTMENT OF PATHOLOGY AND ARTIFICIAL SCIENCE TOLEDO, OH (419) 555-8923 DIAGNOSTIC FORM REPORT",
+      "candidates": [
+        {
+          "label": "ORG",
+          "start": 0,
+          "end": 86,
+          "text": "Apollo Diagnostic Form DF-196 Health System APOLLO PATHOLOGY ASSOCIATES, INC CHRISTIAN"
+        },
+        {
+          "label": "ORG",
+          "start": 94,
+          "end": 118,
+          "text": "CITY HOSPITAL DEPARTMENT"
+        },
+        {
+          "label": "FAC",
+          "start": 136,
+          "end": 147,
+          "text": "Main Avenue"
+        },
+        {
+          "label": "GPE",
+          "start": 171,
+          "end": 177,
+          "text": "Toledo"
+        },
+        {
+          "label": "CARDINAL",
+          "start": 189,
+          "end": 192,
+          "text": "419"
+        },
+        {
+          "label": "CARDINAL",
+          "start": 194,
+          "end": 197,
+          "text": "555"
+        },
+        {
+          "label": "PERSON",
+          "start": 250,
+          "end": 269,
+          "text": "Jonathan Miller MRN"
+        },
+        {
+          "label": "CARDINAL",
+          "start": 271,
+          "end": 278,
+          "text": "4829746"
+        },
+        {
+          "label": "CARDINAL",
+          "start": 284,
+          "end": 294,
+          "text": "07/15/2005"
+        },
+        {
+          "label": "GPE",
+          "start": 336,
+          "end": 345,
+          "text": "Wisconsin"
+        },
+        {
+          "label": "PERSON",
+          "start": 380,
+          "end": 402,
+          "text": "Steven Walker RECEIVED"
+        },
+        {
+          "label": "CARDINAL",
+          "start": 420,
+          "end": 421,
+          "text": "4"
+        },
+        {
+          "label": "PERSON",
+          "start": 430,
+          "end": 442,
+          "text": "Joseph Smith"
+        },
+        {
+          "label": "CARDINAL",
+          "start": 482,
+          "end": 483,
+          "text": "2"
+        },
+        {
+          "label": "CARDINAL",
+          "start": 642,
+          "end": 643,
+          "text": "2"
+        },
+        {
+          "label": "ORG",
+          "start": 653,
+          "end": 661,
+          "text": "Mellitus"
+        },
+        {
+          "label": "ORG",
+          "start": 726,
+          "end": 731,
+          "text": "HbAlc"
+        },
+        {
+          "label": "ORG",
+          "start": 760,
+          "end": 767,
+          "text": "concems"
+        },
+        {
+          "label": "PERSON",
+          "start": 900,
+          "end": 913,
+          "text": "nathan Miller"
+        },
+        {
+          "label": "DATE",
+          "start": 923,
+          "end": 933,
+          "text": "15/07/2005"
+        },
+        {
+          "label": "DATE",
+          "start": 940,
+          "end": 951,
+          "text": "20-year-old"
+        },
+        {
+          "label": "CARDINAL",
+          "start": 1002,
+          "end": 1003,
+          "text": "2"
+        },
+        {
+          "label": "ORG",
+          "start": 1016,
+          "end": 1024,
+          "text": "Mellitus"
+        },
+        {
+          "label": "CARDINAL",
+          "start": 1383,
+          "end": 1385,
+          "text": "72"
+        },
+        {
+          "label": "CARDINAL",
+          "start": 1404,
+          "end": 1406,
+          "text": "16"
+        },
+        {
+          "label": "PERSON",
+          "start": 1407,
+          "end": 1425,
+          "text": "Pemperaure Celsius"
+        },
+        {
+          "label": "CARDINAL",
+          "start": 1427,
+          "end": 1431,
+          "text": "36.6"
+        },
+        {
+          "label": "PRODUCT",
+          "start": 1433,
+          "end": 1460,
+          "text": "J Oxygen Saturation Percent"
+        },
+        {
+          "label": "CARDINAL",
+          "start": 1462,
+          "end": 1464,
+          "text": "98"
+        },
+        {
+          "label": "CARDINAL",
+          "start": 1481,
+          "end": 1487,
+          "text": "128/78"
+        },
+        {
+          "label": "ORG",
+          "start": 1533,
+          "end": 1542,
+          "text": "PATHOLOGY"
+        },
+        {
+          "label": "GPE",
+          "start": 1574,
+          "end": 1576,
+          "text": "OH"
+        },
+        {
+          "label": "CARDINAL",
+          "start": 1578,
+          "end": 1581,
+          "text": "419"
+        },
+        {
+          "label": "CARDINAL",
+          "start": 1583,
+          "end": 1586,
+          "text": "555"
+        },
+        {
+          "label": "PHONE",
+          "start": 188,
+          "end": 202,
+          "text": "(419) 555-8923"
+        },
+        {
+          "label": "PHONE",
+          "start": 271,
+          "end": 278,
+          "text": "4829746"
+        },
+        {
+          "label": "PHONE",
+          "start": 318,
+          "end": 325,
+          "text": "8646139"
+        },
+        {
+          "label": "PHONE",
+          "start": 1577,
+          "end": 1591,
+          "text": "(419) 555-8923"
+        }
+      ],
+      "llm_json": {
+        "items": [
+          {
+            "text": "Apollo Diagnostic Form DF-196 Health System APOLLO PATHOLOGY ASSOCIATES, INC CHRISTIAN",
+            "start": 0,
+            "end": 86,
+            "redact": false,
+            "category": "ORG"
+          },
+          {
+            "text": "CITY HOSPITAL DEPARTMENT",
+            "start": 94,
+            "end": 118,
+            "redact": false,
+            "category": "ORG"
+          },
+          {
+            "text": "Main Avenue",
+            "start": 136,
+            "end": 147,
+            "redact": false,
+            "category": "LOC"
+          },
+          {
+            "text": "Toledo",
+            "start": 171,
+            "end": 177,
+            "redact": false,
+            "category": "GPE"
+          },
+          {
+            "text": "419",
+            "start": 189,
+            "end": 192,
+            "redact": false,
+            "category": "OTHER"
+          },
+          {
+            "text": "555",
+            "start": 194,
+            "end": 197,
+            "redact": false,
+            "category": "OTHER"
+          },
+          {
+            "text": "Jonathan Miller MRN",
+            "start": 250,
+            "end": 269,
+            "redact": true,
+            "category": "PERSON"
+          },
+          {
+            "text": "4829746",
+            "start": 271,
+            "end": 278,
+            "redact": true,
+            "category": "OTHER"
+          },
+          {
+            "text": "07/15/2005",
+            "start": 284,
+            "end": 294,
+            "redact": true,
+            "category": "DATE"
+          },
+          {
+            "text": "Wisconsin",
+            "start": 336,
+            "end": 345,
+            "redact": false,
+            "category": "GPE"
+          },
+          {
+            "text": "Steven Walker RECEIVED",
+            "start": 380,
+            "end": 402,
+            "redact": true,
+            "category": "PERSON"
+          },
+          {
+            "text": "4",
+            "start": 420,
+            "end": 421,
+            "redact": false,
+            "category": "OTHER"
+          },
+          {
+            "text": "Joseph Smith",
+            "start": 430,
+            "end": 442,
+            "redact": true,
+            "category": "PERSON"
+          },
+          {
+            "text": "2",
+            "start": 482,
+            "end": 483,
+            "redact": false,
+            "category": "OTHER"
+          },
+          {
+            "text": "2",
+            "start": 642,
+            "end": 643,
+            "redact": false,
+            "category": "OTHER"
+          },
+          {
+            "text": "Mellitus",
+            "start": 653,
+            "end": 661,
+            "redact": false,
+            "category": "OTHER"
+          },
+          {
+            "text": "HbAlc",
+            "start": 726,
+            "end": 731,
+            "redact": false,
+            "category": "OTHER"
+          },
+          {
+            "text": "concems",
+            "start": 760,
+            "end": 767,
+            "redact": false,
+            "category": "OTHER"
+          },
+          {
+            "text": "nathan Miller",
+            "start": 900,
+            "end": 913,
+            "redact": true,
+            "category": "PERSON"
+          },
+          {
+            "text": "15/07/2005",
+            "start": 923,
+            "end": 933,
+            "redact": true,
+            "category": "DATE"
+          },
+          {
+            "text": "20-year-old",
+            "start": 940,
+            "end": 951,
+            "redact": true,
+            "category": "OTHER"
+          },
+          {
+            "text": "2",
+            "start": 1002,
+            "end": 1003,
+            "redact": false,
+            "category": "OTHER"
+          },
+          {
+            "text": "72",
+            "start": 1383,
+            "end": 1385,
+            "redact": false,
+            "category": "OTHER"
+          },
+          {
+            "text": "16",
+            "start": 1404,
+            "end": 1406,
+            "redact": false,
+            "category": "OTHER"
+          },
+          {
+            "text": "Pemperaure Celsius",
+            "start": 1407,
+            "end": 1425,
+            "redact": false,
+            "category": "OTHER"
+          },
+          {
+            "text": "36.6",
+            "start": 1427,
+            "end": 1431,
+            "redact": false,
+            "category": "OTHER"
+          },
+          {
+            "text": "J Oxygen Saturation Percent",
+            "start": 1433,
+            "end": 1460,
+            "redact": false,
+            "category": "OTHER"
+          },
+          {
+            "text": "98",
+            "start": 1462,
+            "end": 1464,
+            "redact": false,
+            "category": "OTHER"
+          },
+          {
+            "text": "128/78",
+            "start": 1481,
+            "end": 1487,
+            "redact": false,
+            "category": "OTHER"
+          },
+          {
+            "text": "PATHOLOGY",
+            "start": 1533,
+            "end": 1542,
+            "redact": false,
+            "category": "ORG"
+          },
+          {
+            "text": "OH",
+            "start": 1574,
+            "end": 1576,
+            "redact": false,
+            "category": "GPE"
+          },
+          {
+            "text": "419",
+            "start": 1578,
+            "end": 1581,
+            "redact": false,
+            "category": "OTHER"
+          },
+          {
+            "text": "555",
+            "start": 1583,
+            "end": 1586,
+            "redact": false,
+            "category": "OTHER"
+          },
+          {
+            "text": "(419) 555-8923",
+            "start": 188,
+            "end": 202,
+            "redact": true,
+            "category": "PHONE"
+          },
+          {
+            "text": "4829746",
+            "start": 271,
+            "end": 278,
+            "redact": true,
+            "category": "PHONE"
+          },
+          {
+            "text": "8646139",
+            "start": 318,
+            "end": 325,
+            "redact": true,
+            "category": "PHONE"
+          },
+          {
+            "text": "(419) 555-8923",
+            "start": 1577,
+            "end": 1591,
+            "redact": true,
+            "category": "PHONE"
+          }
+        ],
+        "notes": "All patient names, medical record numbers, dates of birth, and phone numbers have been marked for redaction. Non‑PII identifiers such as area codes and numeric fragments that do not form complete sensitive data were left unredacted."
+      },
+      "boxes_applied": 12
+    },
+    {
+      "page_index": 1,
+      "text": "FINAL PATIENT SUMMARY REPORT   PATIENT NAME: Jonathan Miller Diagnostic Form: DF-196 MRN: 4829746 Past Hospital Visits Date Reason 15/10/2024 Routine check-up Sh Diabetes management review OS0R 2024 Cold symptoms 12/06/2024 Annual physical exam 28/04/2024 Follow-up appointment LOS 2024 Influenza vaccination Medical Tests SSS SSS SSB SS ee Medication Test Status | On/Last ——— ——— ters bAic Done jow/11/2024 Lipid Panel Done jowi12024 Complete Blood Ss = — jovt12024 Urinalysis | Done ‘ow 11/2024 ECG L jos/11/2024   Julie Ter 4s Electronically Signed insurance Agent DEPARTMENT OF PATHOLOGY AND ARTIFICIAL SCIENCE TOLEDO, OH (419) 555-8923 DIAGNOSTIC FORM REPORT",
+      "candidates": [
+        {
+          "label": "PERSON",
+          "start": 45,
+          "end": 60,
+          "text": "Jonathan Miller"
+        },
+        {
+          "label": "CARDINAL",
+          "start": 90,
+          "end": 97,
+          "text": "4829746"
+        },
+        {
+          "label": "CARDINAL",
+          "start": 194,
+          "end": 198,
+          "text": "2024"
+        },
+        {
+          "label": "DATE",
+          "start": 213,
+          "end": 230,
+          "text": "12/06/2024 Annual"
+        },
+        {
+          "label": "CARDINAL",
+          "start": 282,
+          "end": 286,
+          "text": "2024"
+        },
+        {
+          "label": "ORG",
+          "start": 331,
+          "end": 373,
+          "text": "SSB SS ee Medication Test Status | On/Last"
+        },
+        {
+          "label": "PERSON",
+          "start": 458,
+          "end": 478,
+          "text": "jovt12024 Urinalysis"
+        },
+        {
+          "label": "PERSON",
+          "start": 518,
+          "end": 527,
+          "text": "Julie Ter"
+        },
+        {
+          "label": "CARDINAL",
+          "start": 528,
+          "end": 530,
+          "text": "4s"
+        },
+        {
+          "label": "ORG",
+          "start": 583,
+          "end": 592,
+          "text": "PATHOLOGY"
+        },
+        {
+          "label": "GPE",
+          "start": 624,
+          "end": 626,
+          "text": "OH"
+        },
+        {
+          "label": "CARDINAL",
+          "start": 628,
+          "end": 631,
+          "text": "419"
+        },
+        {
+          "label": "CARDINAL",
+          "start": 633,
+          "end": 636,
+          "text": "555"
+        },
+        {
+          "label": "PHONE",
+          "start": 90,
+          "end": 97,
+          "text": "4829746"
+        },
+        {
+          "label": "PHONE",
+          "start": 627,
+          "end": 641,
+          "text": "(419) 555-8923"
+        }
+      ],
+      "llm_json": {
+        "items": [
+          {
+            "text": "Jonathan Miller",
+            "start": 45,
+            "end": 60,
+            "redact": true,
+            "category": "PERSON"
+          },
+          {
+            "text": "4829746",
+            "start": 90,
+            "end": 97,
+            "redact": true,
+            "category": "OTHER"
+          },
+          {
+            "text": "2024",
+            "start": 194,
+            "end": 198,
+            "redact": false,
+            "category": "DATE"
+          },
+          {
+            "text": "12/06/2024 Annual",
+            "start": 213,
+            "end": 230,
+            "redact": true,
+            "category": "DATE"
+          },
+          {
+            "text": "2024",
+            "start": 282,
+            "end": 286,
+            "redact": false,
+            "category": "DATE"
+          },
+          {
+            "text": "SSB SS ee Medication Test Status | On/Last",
+            "start": 331,
+            "end": 373,
+            "redact": false,
+            "category": "OTHER"
+          },
+          {
+            "text": "jovt12024 Urinalysis",
+            "start": 458,
+            "end": 478,
+            "redact": false,
+            "category": "OTHER"
+          },
+          {
+            "text": "Julie Ter",
+            "start": 518,
+            "end": 527,
+            "redact": true,
+            "category": "PERSON"
+          },
+          {
+            "text": "4s",
+            "start": 528,
+            "end": 530,
+            "redact": false,
+            "category": "OTHER"
+          },
+          {
+            "text": "PATHOLOGY",
+            "start": 583,
+            "end": 592,
+            "redact": false,
+            "category": "ORG"
+          },
+          {
+            "text": "OH",
+            "start": 624,
+            "end": 626,
+            "redact": false,
+            "category": "GPE"
+          },
+          {
+            "text": "419",
+            "start": 628,
+            "end": 631,
+            "redact": false,
+            "category": "CARDINAL"
+          },
+          {
+            "text": "555",
+            "start": 633,
+            "end": 636,
+            "redact": false,
+            "category": "CARDINAL"
+          },
+          {
+            "text": "4829746",
+            "start": 90,
+            "end": 97,
+            "redact": false,
+            "category": "OTHER"
+          },
+          {
+            "text": "(419) 555-8923",
+            "start": 627,
+            "end": 641,
+            "redact": true,
+            "category": "PHONE"
+          }
+        ],
+        "notes": "Duplicate MRN span (90-97) appears twice; treated as a single PII entity (Medical Record Number)."
+      },
+      "boxes_applied": 5
+    }
+  ],
+  "out": "data/out/docout.pdf"
+}

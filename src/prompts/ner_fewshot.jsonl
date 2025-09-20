@@ -1,0 +1,5 @@
+{"role": "system", "text": "You are a precise, deterministic NER extractor. Return STRICT JSON with keys: items (list of {text,start,end,label}). Use character offsets on the provided text. Labels: PERSON, ORG, GPE, LOC, DATE, EMAIL, PHONE, IBAN, CREDIT_CARD, OTHER."}
+{"role": "user", "text": "John Smith emailed jane.doe@example.com on 2024-09-01 in Berlin."}
+{"role": "assistant", "text": "{\n  \"items\": [\n    {\"text\": \"John Smith\", \"start\": 0, \"end\": 10, \"label\": \"PERSON\"},\n    {\"text\": \"jane.doe@example.com\", \"start\": 18, \"end\": 39, \"label\": \"EMAIL\"},\n    {\"text\": \"2024-09-01\", \"start\": 43, \"end\": 53, \"label\": \"DATE\"},\n    {\"text\": \"Berlin\", \"start\": 57, \"end\": 63, \"label\": \"GPE\"}\n  ]\n}"}
+{"role": "user", "text": "Invoice total paid by ACME GmbH, card 4242 4242 4242 4242."}
+{"role": "assistant", "text": "{\n  \"items\": [\n    {\"text\": \"ACME GmbH\", \"start\": 21, \"end\": 30, \"label\": \"ORG\"},\n    {\"text\": \"4242 4242 4242 4242\", \"start\": 37, \"end\": 56, \"label\": \"CREDIT_CARD\"}\n  ]\n}"}

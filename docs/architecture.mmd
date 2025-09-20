@@ -1,0 +1,53 @@
+graph TD
+  %% Minimal styles
+  classDef external fill:#f3f3f3,stroke:#888,color:#222
+  classDef action fill:#e8f1ff,stroke:#4a90e2,color:#111
+  classDef store fill:#fff1e0,stroke:#e67e22,color:#333
+
+  %% Entry / Config
+  I[CLI evanesco run]:::external --> Cfg[RunConfig]:::store
+  I --> InPath[Input Path]
+
+  subgraph Ingestion
+    InPath -->|PDF| Raster{Rasterize}
+    InPath -->|Images| ImgList[Page Images]:::store
+    Raster -->|pdf2image Poppler| ImgList
+    Raster -->|PyMuPDF fallback| ImgList
+  end
+
+  subgraph PerPagePipeline
+    direction LR
+    ImgList --> OCR[Tesseract OCR]:::action
+    OCR --> Text[Reconstruct Text]:::action
+    Text --> Spa[spaCy NER]:::action
+    Text --> Re[Regex patterns]:::action
+    Spa --> Cand[Candidates]:::store
+    Re  --> Cand
+
+    Cand -->|optional| LLM[Ollama gpt_oss_20b]:::action
+    LLM --> Dec[LLM Decisions]:::store
+    Cand -->|no LLM| Final[Final Spans]:::store
+    Dec  --> Final
+
+    OCR  --> Align[Align spans to OCR boxes]:::action
+    Final --> Align
+    Align --> Boxes[PII Boxes]:::store
+    Boxes --> Redact[Draw boxes]:::action
+    Redact --> RedPages[Redacted Pages]:::store
+  end
+
+  subgraph Output
+    RedPages --> PDF[img2pdf Redacted PDF]:::action
+    Cand --> Meta[meta json]:::store
+  end
+
+  subgraph ServicesDeps
+    T[Tesseract]:::external
+    Pop[Poppler]:::external
+    Oll[Ollama Server]:::external
+  end
+
+  OCR --- T
+  Raster --- Pop
+  LLM --- Oll
+
