@@ -32,6 +32,9 @@ dependencies = [
     "pandas>=2.3.2",
     "gradio>=4.44.0",
     "PyYAML>=6.0.1",
+    "ruff>=0.13.0",
+    "bandit>=1.8.6",
+    "safety>=3.6.1",
 ]
 
 [project.scripts]

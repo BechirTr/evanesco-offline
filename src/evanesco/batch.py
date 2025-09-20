@@ -6,7 +6,6 @@ directory, preserving base filenames.
 
 from __future__ import annotations
 
-from dataclasses import asdict
 from typing import List, Tuple
 from pathlib import Path
 from concurrent.futures import ProcessPoolExecutor, as_completed

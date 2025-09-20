@@ -27,6 +27,9 @@ Requires-Dist: requests>=2.32.3
 Requires-Dist: pandas>=2.3.2
 Requires-Dist: gradio>=4.44.0
 Requires-Dist: PyYAML>=6.0.1
+Requires-Dist: ruff>=0.13.0
+Requires-Dist: bandit>=1.8.6
+Requires-Dist: safety>=3.6.1
 Provides-Extra: docs
 Requires-Dist: sphinx>=7.0.0; extra == "docs"
 Requires-Dist: myst-parser>=2.0.0; extra == "docs"

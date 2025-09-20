@@ -9,7 +9,12 @@ from __future__ import annotations
 
 from typing import Dict, Any, List, Optional
 from pathlib import Path
-import hashlib, hmac, os, socket, getpass, time
+import hashlib
+import hmac
+import os
+import socket
+import getpass
+import time
 import orjson
 
 
@@ -102,7 +107,7 @@ def write_audit(
     data_bytes = orjson.dumps(record)
     if key:
         sig = hmac.new(key.encode("utf-8"), data_bytes, hashlib.sha256).hexdigest()
-        record["hmac"] = {"alg": "HMAC-SHA256", "key_hint": f"env:EVANESCO_HMAC_KEY", "value": sig}
+        record["hmac"] = {"alg": "HMAC-SHA256", "key_hint": "env:EVANESCO_HMAC_KEY", "value": sig}
 
     audit_path.write_bytes(orjson.dumps(record, option=orjson.OPT_INDENT_2))
     return audit_path

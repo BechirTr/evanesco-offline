@@ -10,7 +10,7 @@ import typer
 from pathlib import Path
 from typing import Optional
 from rich import print
-from .core import RunConfig, process_pdf, process_path
+from .core import RunConfig, process_path
 from .ui import launch as launch_ui
 from .batch import run_batch
 import orjson
@@ -70,10 +70,10 @@ def run(
     # Resolve spaCy model when 'auto' requested based on OCR lang
     _sm = spacy_model
     if (_sm or "").strip().lower() == "auto":
-        l = (lang or "").lower()
-        if l.startswith("fr"):
+        lang_lower = (lang or "").lower()
+        if lang_lower.startswith("fr"):
             _sm = "fr_core_news_lg"
-        elif l.startswith("en"):
+        elif lang_lower.startswith("en"):
             _sm = "en_core_web_lg"
         else:
             _sm = "en_core_web_lg"
@@ -201,10 +201,10 @@ def batch(
     # Resolve spaCy model when 'auto'
     _sm = spacy_model
     if (_sm or "").strip().lower() == "auto":
-        l = (lang or "").lower()
-        if l.startswith("fr"):
+        lang_lower = (lang or "").lower()
+        if lang_lower.startswith("fr"):
             _sm = "fr_core_news_lg"
-        elif l.startswith("en"):
+        elif lang_lower.startswith("en"):
             _sm = "en_core_web_lg"
         else:
             _sm = "en_core_web_lg"

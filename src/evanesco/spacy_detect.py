@@ -58,8 +58,12 @@ def _load_spacy(nlp_name: str):
     lang_hint = None
     for token in [name, os.environ.get("EVANESCO_LANG", ""), os.environ.get("LANG", "")]:
         t = (token or "").lower()
-        if t.startswith("en"): lang_hint = "en"; break
-        if t.startswith("fr") or t.startswith("fra"): lang_hint = "fr"; break
+        if t.startswith("en"):
+            lang_hint = "en"
+            break
+        if t.startswith("fr") or t.startswith("fra"):
+            lang_hint = "fr"
+            break
     fallback_models = []
     if lang_hint == "fr":
         fallback_models = ["fr_core_news_sm", "en_core_web_sm"]

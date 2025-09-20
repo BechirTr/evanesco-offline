@@ -6,7 +6,8 @@ export a set of page images back to a compact PDF while preserving layout.
 
 from typing import List, Tuple
 from PIL import Image, ImageDraw
-import img2pdf, io
+import img2pdf
+import io
 from PIL import ImageFont
 
 

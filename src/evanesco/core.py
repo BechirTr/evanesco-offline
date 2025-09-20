@@ -4,20 +4,20 @@ This module wires together OCR, detection (spaCy and regex), optional LLM
 confirmation via Ollama, geometric alignment and final redaction.
 """
 
-from typing import Optional, List, Dict, Any, Tuple
+from typing import Optional, List, Dict, Any
 from importlib import resources
 from dataclasses import dataclass
 from pydantic import BaseModel
 from pathlib import Path
 from PIL import Image
-import orjson, json
+import json
 from tqdm import tqdm
 from .ocr import pdf_to_images, image_ocr_tsv
 from .spacy_detect import spacy_ents
 from .regex_detect import regex_findall
 from .llm import OllamaClient
 from .redact import redact_page, save_pdf, redact_page_with_labels, draw_preview
-from .align import spans_to_boxes, spans_to_box_info
+from .align import spans_to_box_info
 from .policy import Policy, find_builtin_policy
 from .audit import write_audit
 import mimetypes

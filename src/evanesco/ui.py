@@ -24,7 +24,7 @@ from pathlib import Path
 from typing import Tuple, Any, Dict, TYPE_CHECKING
 
 if TYPE_CHECKING:
-    import gradio as gr  # type: ignore
+    pass  # type: ignore
 
 from .core import RunConfig, process_path
 
