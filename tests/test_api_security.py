@@ -41,7 +41,11 @@ def test_readyz_reflects_health(monkeypatch: pytest.MonkeyPatch):
     client, api = _make_client()
 
     def fake_checks(_settings):
-        return [HealthCheckResult(name="tesseract", status="fail", detail="missing", required=True)]
+        return [
+            HealthCheckResult(
+                name="tesseract", status="fail", detail="missing", required=True
+            )
+        ]
 
     monkeypatch.setattr(api, "run_readiness_checks", fake_checks)
     resp = client.get("/readyz")
