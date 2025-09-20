@@ -557,7 +557,7 @@ def build_interface():
 
 
 def launch(
-    server_name: str = "0.0.0.0", server_port: int = 7860, inbrowser: bool = False
+    server_name: str = "127.0.0.1", server_port: int = 7860, inbrowser: bool = False
 ) -> None:
     """Launch the Gradio UI.
 

@@ -169,7 +169,10 @@ def eval(
 
 @app.command()
 def ui(
-    host: str = typer.Option("0.0.0.0", help="Host to bind the UI server"),
+    host: str = typer.Option(
+        "127.0.0.1",
+        help="Host to bind the UI server (use 0.0.0.0 only when intentional)",
+    ),
     port: int = typer.Option(7860, help="Port for the UI server"),
     inbrowser: bool = typer.Option(False, help="Open browser on launch"),
 ):

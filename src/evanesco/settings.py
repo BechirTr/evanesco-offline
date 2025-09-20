@@ -35,7 +35,7 @@ def _split_csv(value: str | None) -> List[str]:
 class ServiceSettings:
     """Runtime settings tailored for container/Kubernetes deployments."""
 
-    api_host: str = "0.0.0.0"
+    api_host: str = "127.0.0.1"
     api_port: int = 8000
     api_token: Optional[str] = None
     cors_origins: List[str] = field(default_factory=list)
@@ -52,7 +52,7 @@ class ServiceSettings:
     def from_env() -> "ServiceSettings":
         cors_raw = os.environ.get("EVANESCO_API_CORS_ORIGINS")
         settings = ServiceSettings(
-            api_host=os.environ.get("EVANESCO_API_HOST", "0.0.0.0"),
+            api_host=os.environ.get("EVANESCO_API_HOST", "127.0.0.1"),
             api_port=int(os.environ.get("EVANESCO_API_PORT", "8000")),
             api_token=os.environ.get("EVANESCO_API_TOKEN"),
             cors_origins=_split_csv(cors_raw),
