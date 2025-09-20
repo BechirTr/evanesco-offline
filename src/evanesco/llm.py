@@ -12,7 +12,14 @@ import requests
 
 
 class LLMClient:
-    def generate(self, prompt: str, *, model: str, options: Optional[Dict[str, Any]] = None, timeout: int = 120) -> str:  # noqa: D401
+    def generate(
+        self,
+        prompt: str,
+        *,
+        model: str,
+        options: Optional[Dict[str, Any]] = None,
+        timeout: int = 120,
+    ) -> str:  # noqa: D401
         """Generate a completion. Implement in subclasses."""
         raise NotImplementedError
 
@@ -23,7 +30,14 @@ class OllamaClient(LLMClient):
     retries: int = 2
     backoff: float = 1.5
 
-    def generate(self, prompt: str, *, model: str, options: Optional[Dict[str, Any]] = None, timeout: int = 120) -> str:
+    def generate(
+        self,
+        prompt: str,
+        *,
+        model: str,
+        options: Optional[Dict[str, Any]] = None,
+        timeout: int = 120,
+    ) -> str:
         payload: Dict[str, Any] = {"model": model, "prompt": prompt, "stream": False}
         if options:
             payload["options"] = options
@@ -44,7 +58,14 @@ class OllamaClient(LLMClient):
             raise last_exc
         return ""
 
-    def generate_raw(self, prompt: str, *, model: str, options: Optional[Dict[str, Any]] = None, timeout: int = 120) -> Dict[str, Any]:
+    def generate_raw(
+        self,
+        prompt: str,
+        *,
+        model: str,
+        options: Optional[Dict[str, Any]] = None,
+        timeout: int = 120,
+    ) -> Dict[str, Any]:
         """Return full Ollama JSON (includes timings, counts) for explainability."""
         payload: Dict[str, Any] = {"model": model, "prompt": prompt, "stream": False}
         if options:

@@ -20,7 +20,9 @@ def _one(args: Tuple[str, str, RunConfig]) -> Tuple[str, str, str]:
     return inp, out_path, res.get("out", out_path)
 
 
-def run_batch(inputs: List[str], output_dir: str, cfg: RunConfig, workers: int = 2) -> List[Tuple[str, str]]:
+def run_batch(
+    inputs: List[str], output_dir: str, cfg: RunConfig, workers: int = 2
+) -> List[Tuple[str, str]]:
     """Process multiple inputs concurrently.
 
     Returns a list of (input, output) pairs.
@@ -36,4 +38,3 @@ def run_batch(inputs: List[str], output_dir: str, cfg: RunConfig, workers: int =
             except Exception:
                 pass
     return results
-

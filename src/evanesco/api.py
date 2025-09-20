@@ -13,7 +13,16 @@ import tempfile
 from pathlib import Path
 from typing import Optional
 
-from fastapi import Depends, FastAPI, File, Form, HTTPException, Security, UploadFile, status
+from fastapi import (
+    Depends,
+    FastAPI,
+    File,
+    Form,
+    HTTPException,
+    Security,
+    UploadFile,
+    status,
+)
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -39,13 +48,17 @@ if settings.cors_origins:
 _bearer_scheme = HTTPBearer(auto_error=False)
 
 
-def require_auth(credentials: HTTPAuthorizationCredentials = Security(_bearer_scheme)) -> None:
+def require_auth(
+    credentials: HTTPAuthorizationCredentials = Security(_bearer_scheme),
+) -> None:
     """Simple bearer-token protection for managed cluster deployments."""
     token = settings.api_token
     if token is None:
         return
     if credentials is None or credentials.credentials != token:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized"
+        )
 
 
 # Optional Prometheus metrics mount
@@ -80,7 +93,11 @@ def readyz():
         if chk.status == "fail" and chk.required:
             ready = False
             break
-        if chk.status == "warn" and chk.required and not settings.allowance_warn_only_checks:
+        if (
+            chk.status == "warn"
+            and chk.required
+            and not settings.allowance_warn_only_checks
+        ):
             ready = False
             break
     content = {
@@ -141,7 +158,9 @@ async def redact(
     )
     try:
         process_path(str(inp), str(out_pdf), cfg)
-        return FileResponse(str(out_pdf), media_type="application/pdf", filename=out_pdf.name)
+        return FileResponse(
+            str(out_pdf), media_type="application/pdf", filename=out_pdf.name
+        )
     except Exception as e:
         return JSONResponse({"status": "error", "message": str(e)}, status_code=400)
 

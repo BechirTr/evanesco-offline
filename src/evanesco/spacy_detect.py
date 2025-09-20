@@ -56,7 +56,11 @@ def _load_spacy(nlp_name: str):
             errors.append(f"import_module failed: {e}")
     # Language-aware small model fallbacks
     lang_hint = None
-    for token in [name, os.environ.get("EVANESCO_LANG", ""), os.environ.get("LANG", "")]:
+    for token in [
+        name,
+        os.environ.get("EVANESCO_LANG", ""),
+        os.environ.get("LANG", ""),
+    ]:
         t = (token or "").lower()
         if t.startswith("en"):
             lang_hint = "en"
@@ -85,7 +89,7 @@ def _load_spacy(nlp_name: str):
         f"falling back to blank('en') without NER."
     )
     if debug:
-        msg += f" details: exec={os.sys.executable} errors={errors}" # pyright: ignore[reportAttributeAccessIssue]
+        msg += f" details: exec={os.sys.executable} errors={errors}"  # pyright: ignore[reportAttributeAccessIssue]
     warnings.warn(msg)
     return spacy.blank("en")
 

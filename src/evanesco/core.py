@@ -89,6 +89,7 @@ class RunConfig:
     generate_previews: bool = True
     explain_traces: bool = False
 
+
 class PageResult(BaseModel):
     """Per-page output, including raw text, candidates, LLM decision, and stats.
 
@@ -115,6 +116,7 @@ class PageResult(BaseModel):
     timings: Optional[Dict[str, float]] = None
     preview_path: Optional[str] = None
 
+
 def _page_text_from_tsv(tsv_df):
     """Reconstruct a naive text stream from OCR word rows.
 
@@ -130,6 +132,7 @@ def _page_text_from_tsv(tsv_df):
     """
     tokens = [str(x) for x in tsv_df["text"].tolist()]
     return " ".join(tokens)
+
 
 def detect_candidates(text: str, cfg: RunConfig) -> List[Dict[str, Any]]:
     """Run configured detectors and return unique span candidates.
@@ -149,7 +152,14 @@ def detect_candidates(text: str, cfg: RunConfig) -> List[Dict[str, Any]]:
     cands: List[Dict[str, Any]] = []
     if cfg.use_spacy:
         for e in spacy_ents(cfg.spacy_model, text):
-            cands.append({"label": e["label"], "start": e["start"], "end": e["end"], "text": e["text"]})
+            cands.append(
+                {
+                    "label": e["label"],
+                    "start": e["start"],
+                    "end": e["end"],
+                    "text": e["text"],
+                }
+            )
     if cfg.use_llm_ner:
         for e in llm_ner_candidates(text, cfg):
             cands.append(e)
@@ -172,6 +182,7 @@ def llm_ner_candidates(text: str, cfg: RunConfig) -> List[Dict[str, Any]]:
 
     Returns list of span dicts: {label, start, end, text, source="LLM_NER"}.
     """
+
     def _read_prompt() -> str:
         # 1) explicit path if provided
         if cfg.llm_ner_prompt_path:
@@ -185,7 +196,9 @@ def llm_ner_candidates(text: str, cfg: RunConfig) -> List[Dict[str, Any]]:
                 return cand.read_text(encoding="utf-8")
         # 3) packaged fallback
         try:
-            ref = resources.files("evanesco.data").joinpath("prompts", "ner_fewshot.jsonl")
+            ref = resources.files("evanesco.data").joinpath(
+                "prompts", "ner_fewshot.jsonl"
+            )
             if ref.is_file():
                 return ref.read_text(encoding="utf-8")
         except Exception:
@@ -215,6 +228,7 @@ def llm_ner_candidates(text: str, cfg: RunConfig) -> List[Dict[str, Any]]:
         js = json.loads(resp)
     except Exception:
         import re
+
         m = re.search(r"\{[\s\S]*\}", resp)
         if m:
             js = json.loads(m.group(0))
@@ -229,20 +243,26 @@ def llm_ner_candidates(text: str, cfg: RunConfig) -> List[Dict[str, Any]]:
         label = (it.get("label") or "OTHER").upper()
         if t is None:
             continue
-        if not isinstance(s, int) or not isinstance(e, int) or not (0 <= s < e <= len(text)):
+        if (
+            not isinstance(s, int)
+            or not isinstance(e, int)
+            or not (0 <= s < e <= len(text))
+        ):
             # fallback: locate substring
             idx = text.find(t)
             if idx >= 0:
                 s, e = idx, idx + len(t)
             else:
                 continue
-        out.append({
-            "label": label,
-            "start": int(s),
-            "end": int(e),
-            "text": text[int(s): int(e)],
-            "source": "LLM_NER",
-        })
+        out.append(
+            {
+                "label": label,
+                "start": int(s),
+                "end": int(e),
+                "text": text[int(s) : int(e)],
+                "source": "LLM_NER",
+            }
+        )
     # Deduplicate within LLM results
     seen = set()
     uniq: List[Dict[str, Any]] = []
@@ -253,7 +273,10 @@ def llm_ner_candidates(text: str, cfg: RunConfig) -> List[Dict[str, Any]]:
             uniq.append(c)
     return uniq
 
-def llm_filter(text: str, cands: List[Dict[str, Any]], cfg: RunConfig) -> Dict[str, Any]:
+
+def llm_filter(
+    text: str, cands: List[Dict[str, Any]], cfg: RunConfig
+) -> Dict[str, Any]:
     """Ask a local LLM (Ollama) to confirm redactions and assign categories.
 
     Parameters
@@ -275,9 +298,15 @@ def llm_filter(text: str, cands: List[Dict[str, Any]], cfg: RunConfig) -> Dict[s
         return {"items": [], "notes": "no candidates"}
     # compact representation for the LLM
     items = [
-        {"text": c["text"], "start": c["start"], "end": c["end"], "label": c.get("label", "OTHER")}
+        {
+            "text": c["text"],
+            "start": c["start"],
+            "end": c["end"],
+            "label": c.get("label", "OTHER"),
+        }
         for c in cands
     ]
+
     def _read_prompt() -> str:
         # 1) explicit path if provided
         if cfg.prompt_path:
@@ -291,7 +320,9 @@ def llm_filter(text: str, cands: List[Dict[str, Any]], cfg: RunConfig) -> Dict[s
                 return cand.read_text(encoding="utf-8")
         # 3) packaged fallback
         try:
-            ref = resources.files("evanesco.data").joinpath("prompts", "pii_audit.jsonl")
+            ref = resources.files("evanesco.data").joinpath(
+                "prompts", "pii_audit.jsonl"
+            )
             if ref.is_file():
                 return ref.read_text(encoding="utf-8")
         except Exception:
@@ -302,6 +333,7 @@ def llm_filter(text: str, cands: List[Dict[str, Any]], cfg: RunConfig) -> Dict[s
             "Return only JSON with keys: items (list of {text,start,end,redact,category}), notes.\n"
             "Categories may include PERSON, ORG, GPE, LOC, DATE, EMAIL, PHONE, IBAN, CREDIT_CARD, OTHER.\n"
         )
+
     prompt = _read_prompt()
     user = {
         "page_text": text,
@@ -321,6 +353,7 @@ def llm_filter(text: str, cands: List[Dict[str, Any]], cfg: RunConfig) -> Dict[s
     except Exception:
         # try to extract JSON block
         import re
+
         m = re.search(r"\{[\s\S]*\}", resp)
         if m:
             js = json.loads(m.group(0))
@@ -357,21 +390,26 @@ def llm_filter(text: str, cands: List[Dict[str, Any]], cfg: RunConfig) -> Dict[s
         js["trace"] = {"prompt": full, "raw": raw}
     return js
 
+
 def _resolve_policy(cfg: RunConfig) -> Optional[Policy]:
     if cfg.policy_path:
         p = Path(cfg.policy_path)
         if p.exists():
             from .policy import Policy as _P
+
             return _P.from_file(p)
         # try builtin name
         found = find_builtin_policy(cfg.policy_path)
         if found:
             from .policy import Policy as _P
+
             return _P.from_file(found)
     return None
 
 
-def _process_images(images: List[Image.Image], output_path: str, cfg: RunConfig) -> Dict[str, Any]:
+def _process_images(
+    images: List[Image.Image], output_path: str, cfg: RunConfig
+) -> Dict[str, Any]:
     """Run OCR → detect → (optional LLM) → redact on images and export a PDF.
 
     Parameters
@@ -390,6 +428,7 @@ def _process_images(images: List[Image.Image], output_path: str, cfg: RunConfig)
         ``out`` (PDF path).
     """
     import time
+
     out_base = Path(output_path)
     preview_dir = out_base.parent / f"{out_base.stem}.previews"
     trace_dir = out_base.parent / f"{out_base.stem}.traces"
@@ -431,41 +470,51 @@ def _process_images(images: List[Image.Image], output_path: str, cfg: RunConfig)
                 if policy is not None:
                     decision = decision and policy.should_redact(cat)
                 if decision:
-                    final_spans.append({
-                        "start": it["start"],
-                        "end": it["end"],
-                        "text": it.get("text", page_text[it["start"]:it["end"]]),
-                        "label": cat,
-                        "source": "LLM",
-                    })
+                    final_spans.append(
+                        {
+                            "start": it["start"],
+                            "end": it["end"],
+                            "text": it.get("text", page_text[it["start"] : it["end"]]),
+                            "label": cat,
+                            "source": "LLM",
+                        }
+                    )
         else:
             # redact everything detected deterministically
             for c in candidates:
                 cat = c.get("label", "OTHER")
                 decision = True if policy is None else policy.should_redact(cat)
                 if decision:
-                    final_spans.append({
-                        "start": c["start"],
-                        "end": c["end"],
-                        "text": c.get("text", page_text[c["start"]:c["end"]]),
-                        "label": cat,
-                        "source": c.get("source", "DETECTOR"),
-                    })
+                    final_spans.append(
+                        {
+                            "start": c["start"],
+                            "end": c["end"],
+                            "text": c.get("text", page_text[c["start"] : c["end"]]),
+                            "label": cat,
+                            "source": c.get("source", "DETECTOR"),
+                        }
+                    )
 
         # kept vs rejected boxes
         t_align0 = time.perf_counter()
         box_infos = spans_to_box_info(tsv, page_text, final_spans)
         boxes = [b["box"] for b in box_infos]
         kept_keys = {(s["start"], s["end"]) for s in final_spans}
-        rejected_spans = [c for c in candidates if (c["start"], c["end"]) not in kept_keys]
+        rejected_spans = [
+            c for c in candidates if (c["start"], c["end"]) not in kept_keys
+        ]
         rejected_infos = spans_to_box_info(tsv, page_text, rejected_spans)
         rejected_boxes = [b["box"] for b in rejected_infos]
         t_align = time.perf_counter()
 
         if cfg.mode == "label":
-            red_img = redact_page_with_labels(img, box_infos, fill_rgb=cfg.fill_rgb, inflate_px=cfg.box_inflation_px)
+            red_img = redact_page_with_labels(
+                img, box_infos, fill_rgb=cfg.fill_rgb, inflate_px=cfg.box_inflation_px
+            )
         else:
-            red_img = redact_page(img, boxes, fill_rgb=cfg.fill_rgb, inflate_px=cfg.box_inflation_px)
+            red_img = redact_page(
+                img, boxes, fill_rgb=cfg.fill_rgb, inflate_px=cfg.box_inflation_px
+            )
         redacted_imgs.append(red_img)
         t_redact = time.perf_counter()
 
@@ -479,14 +528,20 @@ def _process_images(images: List[Image.Image], output_path: str, cfg: RunConfig)
         # Save explain trace if requested
         if cfg.explain_traces and llm_json and llm_json.get("trace"):
             trace = llm_json.get("trace")
-            (trace_dir / f"page_{idx:04d}.llm.json").write_text(json.dumps(trace), encoding="utf-8")
+            (trace_dir / f"page_{idx:04d}.llm.json").write_text(
+                json.dumps(trace), encoding="utf-8"
+            )
 
         timings = None
         if cfg.instrument:
             timings = {
                 "ocr": t_ocr - t0,
                 "detect": t_det - t_det0,
-                **({"llm": (t_llm - t_llm0)} if (t_llm0 is not None and t_llm is not None) else {}),
+                **(
+                    {"llm": (t_llm - t_llm0)}
+                    if (t_llm0 is not None and t_llm is not None)
+                    else {}
+                ),
                 "align": t_align - t_align0,
                 "redact": t_redact - t_align,
                 "total": t_redact - t0,
@@ -566,7 +621,13 @@ def process_path(input_path: str, output_path: str, cfg: RunConfig) -> Dict[str,
         res = _process_images(imgs, output_path, cfg)
         try:
             pol = _resolve_policy(cfg)
-            write_audit(str(p), output_path, res, cfg.__dict__, policy=pol.to_dict() if pol else None)
+            write_audit(
+                str(p),
+                output_path,
+                res,
+                cfg.__dict__,
+                policy=pol.to_dict() if pol else None,
+            )
         except Exception:
             pass
         return res
@@ -576,7 +637,13 @@ def process_path(input_path: str, output_path: str, cfg: RunConfig) -> Dict[str,
         res = process_pdf(str(p), output_path, cfg)
         try:
             pol = _resolve_policy(cfg)
-            write_audit(str(p), output_path, res, cfg.__dict__, policy=pol.to_dict() if pol else None)
+            write_audit(
+                str(p),
+                output_path,
+                res,
+                cfg.__dict__,
+                policy=pol.to_dict() if pol else None,
+            )
         except Exception:
             pass
         return res
@@ -585,7 +652,13 @@ def process_path(input_path: str, output_path: str, cfg: RunConfig) -> Dict[str,
         res = _process_images([img], output_path, cfg)
         try:
             pol = _resolve_policy(cfg)
-            write_audit(str(p), output_path, res, cfg.__dict__, policy=pol.to_dict() if pol else None)
+            write_audit(
+                str(p),
+                output_path,
+                res,
+                cfg.__dict__,
+                policy=pol.to_dict() if pol else None,
+            )
         except Exception:
             pass
         return res
@@ -595,7 +668,13 @@ def process_path(input_path: str, output_path: str, cfg: RunConfig) -> Dict[str,
         res = process_pdf(str(p), output_path, cfg)
         try:
             pol = _resolve_policy(cfg)
-            write_audit(str(p), output_path, res, cfg.__dict__, policy=pol.to_dict() if pol else None)
+            write_audit(
+                str(p),
+                output_path,
+                res,
+                cfg.__dict__,
+                policy=pol.to_dict() if pol else None,
+            )
         except Exception:
             pass
         return res
@@ -604,7 +683,13 @@ def process_path(input_path: str, output_path: str, cfg: RunConfig) -> Dict[str,
         res = _process_images([img], output_path, cfg)
         try:
             pol = _resolve_policy(cfg)
-            write_audit(str(p), output_path, res, cfg.__dict__, policy=pol.to_dict() if pol else None)
+            write_audit(
+                str(p),
+                output_path,
+                res,
+                cfg.__dict__,
+                policy=pol.to_dict() if pol else None,
+            )
         except Exception:
             pass
         return res

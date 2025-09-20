@@ -56,14 +56,28 @@ class ServiceSettings:
             api_port=int(os.environ.get("EVANESCO_API_PORT", "8000")),
             api_token=os.environ.get("EVANESCO_API_TOKEN"),
             cors_origins=_split_csv(cors_raw),
-            readiness_check_ocr=_parse_bool(os.environ.get("EVANESCO_READY_CHECK_OCR"), default=True),
-            readiness_check_spacy=_parse_bool(os.environ.get("EVANESCO_READY_CHECK_SPACY"), default=True),
-            readiness_check_llm=_parse_bool(os.environ.get("EVANESCO_READY_CHECK_LLM"), default=False),
-            readiness_spacy_model=os.environ.get("EVANESCO_READY_SPACY_MODEL") or "en_core_web_lg",
-            readiness_tesseract_langs=_split_csv(os.environ.get("EVANESCO_READY_TESS_LANGS")) or ["eng"],
+            readiness_check_ocr=_parse_bool(
+                os.environ.get("EVANESCO_READY_CHECK_OCR"), default=True
+            ),
+            readiness_check_spacy=_parse_bool(
+                os.environ.get("EVANESCO_READY_CHECK_SPACY"), default=True
+            ),
+            readiness_check_llm=_parse_bool(
+                os.environ.get("EVANESCO_READY_CHECK_LLM"), default=False
+            ),
+            readiness_spacy_model=os.environ.get("EVANESCO_READY_SPACY_MODEL")
+            or "en_core_web_lg",
+            readiness_tesseract_langs=_split_csv(
+                os.environ.get("EVANESCO_READY_TESS_LANGS")
+            )
+            or ["eng"],
             readiness_llm_health_url=os.environ.get("EVANESCO_LLM_HEALTH_URL"),
-            llm_generate_url=os.environ.get("EVANESCO_LLM_URL", "http://localhost:11434/api/generate"),
-            allowance_warn_only_checks=_parse_bool(os.environ.get("EVANESCO_READY_WARN_ONLY"), default=True),
+            llm_generate_url=os.environ.get(
+                "EVANESCO_LLM_URL", "http://localhost:11434/api/generate"
+            ),
+            allowance_warn_only_checks=_parse_bool(
+                os.environ.get("EVANESCO_READY_WARN_ONLY"), default=True
+            ),
         )
         return settings
 

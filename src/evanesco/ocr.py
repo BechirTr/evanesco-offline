@@ -103,7 +103,9 @@ def _preprocess_image(
             angles = []
             for rho_theta in lines[:200]:
                 rho, theta = rho_theta[0]
-                angle = (theta * 180 / np.pi) - 90  # convert to degrees, near 0 for horizontal text
+                angle = (
+                    theta * 180 / np.pi
+                ) - 90  # convert to degrees, near 0 for horizontal text
                 # Normalize to [-45, 45]
                 if angle > 45:
                     angle -= 90
@@ -115,10 +117,17 @@ def _preprocess_image(
                 if abs(med) > 0.3 and abs(med) < 8.0:  # avoid over-rotation
                     h, w = work.shape[:2]
                     M = cv2.getRotationMatrix2D((w / 2, h / 2), med, 1.0)
-                    work = cv2.warpAffine(work, M, (w, h), flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_REPLICATE)
+                    work = cv2.warpAffine(
+                        work,
+                        M,
+                        (w, h),
+                        flags=cv2.INTER_LINEAR,
+                        borderMode=cv2.BORDER_REPLICATE,
+                    )
     if binarize:
-        work = cv2.adaptiveThreshold(work, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-                                     cv2.THRESH_BINARY, 35, 15)
+        work = cv2.adaptiveThreshold(
+            work, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 35, 15
+        )
     return Image.fromarray(work)
 
 
@@ -171,6 +180,7 @@ def image_ocr_tsv(
         cfg.update(tess_configs)
     for k, v in cfg.items():
         custom_oem_psm_config += f" -c {k}={v}"
+
     def run(psm_value: int):
         cfg_str = custom_oem_psm_config.replace(f"--psm {psm}", f"--psm {psm_value}")
         return pytesseract.image_to_data(

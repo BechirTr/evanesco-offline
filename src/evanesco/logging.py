@@ -31,4 +31,3 @@ def get_logger(name: str = "evanesco") -> logging.Logger:
         logger.addHandler(h)
         logger.setLevel(logging.INFO)
     return logger
-

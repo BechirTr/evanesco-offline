@@ -46,14 +46,18 @@ def _check_tesseract(langs: List[str]) -> HealthCheckResult:
 
 def _check_spacy_model(model_name: Optional[str]) -> HealthCheckResult:
     if not model_name:
-        return HealthCheckResult(name="spacy", status="warn", detail="Model not specified", required=False)
+        return HealthCheckResult(
+            name="spacy", status="warn", detail="Model not specified", required=False
+        )
     try:
         from .spacy_detect import _load_spacy
 
         nlp = _load_spacy(model_name)
         has_ner = "ner" in getattr(nlp, "pipe_names", [])
         if not has_ner:
-            return HealthCheckResult(name="spacy", status="warn", detail="NER component missing")
+            return HealthCheckResult(
+                name="spacy", status="warn", detail="NER component missing"
+            )
         return HealthCheckResult(name="spacy", status="pass")
     except Exception as exc:  # pragma: no cover - depends on runtime
         return HealthCheckResult(name="spacy", status="fail", detail=str(exc))
@@ -66,9 +70,15 @@ def _check_llm_endpoint(url: str, health_url: Optional[str]) -> HealthCheckResul
     try:
         resp = requests.request("HEAD", target, timeout=2)
         if resp.status_code >= 500:
-            return HealthCheckResult(name="llm", status="fail", detail=f"HTTP {resp.status_code}")
+            return HealthCheckResult(
+                name="llm", status="fail", detail=f"HTTP {resp.status_code}"
+            )
         if resp.status_code == 405:
-            return HealthCheckResult(name="llm", status="warn", detail="HEAD not supported, endpoint reachable")
+            return HealthCheckResult(
+                name="llm",
+                status="warn",
+                detail="HEAD not supported, endpoint reachable",
+            )
         return HealthCheckResult(name="llm", status="pass")
     except Exception as exc:  # pragma: no cover - network dependent
         return HealthCheckResult(name="llm", status="fail", detail=str(exc))
@@ -82,6 +92,8 @@ def run_readiness_checks(settings: ServiceSettings) -> List[HealthCheckResult]:
         checks.append(_check_spacy_model(settings.readiness_spacy_model))
     if settings.readiness_check_llm:
         checks.append(
-            _check_llm_endpoint(settings.llm_generate_url, settings.readiness_llm_health_url)
+            _check_llm_endpoint(
+                settings.llm_generate_url, settings.readiness_llm_health_url
+            )
         )
     return checks

@@ -11,7 +11,9 @@ import io
 from PIL import ImageFont
 
 
-def _inflate(box: Tuple[int, int, int, int], px: int, W: int, H: int) -> Tuple[int, int, int, int]:
+def _inflate(
+    box: Tuple[int, int, int, int], px: int, W: int, H: int
+) -> Tuple[int, int, int, int]:
     """Inflate a rectangle while clamping to image bounds.
 
     Parameters
@@ -66,7 +68,7 @@ def redact_page(
         img = img.convert("RGB")
     W, H = img.size
     draw = ImageDraw.Draw(img)
-    for (x, y, w, h) in boxes:
+    for x, y, w, h in boxes:
         x2, y2, w2, h2 = _inflate((x, y, w, h), inflate_px, W, H)
         draw.rectangle([x2, y2, x2 + w2, y2 + h2], fill=tuple(fill_rgb))
     return img
@@ -143,8 +145,8 @@ def draw_preview(
         img = img.convert("RGB")
     out = img.copy()
     draw = ImageDraw.Draw(out)
-    for (x, y, w, h) in kept:
+    for x, y, w, h in kept:
         draw.rectangle([x, y, x + w, y + h], outline=kept_color, width=width)
-    for (x, y, w, h) in rejected:
+    for x, y, w, h in rejected:
         draw.rectangle([x, y, x + w, y + h], outline=rejected_color, width=width)
     return out

@@ -17,28 +17,53 @@ import orjson
 
 app = typer.Typer(add_completion=False, help="Evanesco Offline PII Redactor")
 
+
 @app.command()
 def run(
     input: str = typer.Option(..., "--input", "-i", help="Input path (PDF/image/dir)"),
     output: str = typer.Option(..., "--output", "-o", help="Output redacted PDF path"),
-    spacy_model: str = typer.Option("en_core_web_lg", help="spaCy model name (or 'auto')"),
-    use_spacy: bool = typer.Option(True, "--use-spacy/--no-use-spacy", help="Enable spaCy NER detection"),
+    spacy_model: str = typer.Option(
+        "en_core_web_lg", help="spaCy model name (or 'auto')"
+    ),
+    use_spacy: bool = typer.Option(
+        True, "--use-spacy/--no-use-spacy", help="Enable spaCy NER detection"
+    ),
     use_llm: bool = typer.Option(True, help="Use Ollama LLM confirmation"),
-    use_llm_ner: bool = typer.Option(False, help="Use LLM few-shot NER (instead of spaCy)"),
+    use_llm_ner: bool = typer.Option(
+        False, help="Use LLM few-shot NER (instead of spaCy)"
+    ),
     llm_model: str = typer.Option("gpt-oss:20b", help="Ollama model name"),
-    llm_ner_model: Optional[str] = typer.Option(None, help="Override model name for LLM NER"),
-    prompt_path: Optional[str] = typer.Option(None, help="Path to prompts/pii_audit.jsonl"),
-    llm_ner_prompt: Optional[str] = typer.Option(None, help="Path to prompts/ner_fewshot.jsonl for LLM NER"),
-    policy: Optional[str] = typer.Option(None, help="Policy name or YAML path (e.g., default, gdpr, hipaa, pci)"),
+    llm_ner_model: Optional[str] = typer.Option(
+        None, help="Override model name for LLM NER"
+    ),
+    prompt_path: Optional[str] = typer.Option(
+        None, help="Path to prompts/pii_audit.jsonl"
+    ),
+    llm_ner_prompt: Optional[str] = typer.Option(
+        None, help="Path to prompts/ner_fewshot.jsonl for LLM NER"
+    ),
+    policy: Optional[str] = typer.Option(
+        None, help="Policy name or YAML path (e.g., default, gdpr, hipaa, pci)"
+    ),
     dpi: int = typer.Option(400, help="Rasterization DPI for PDFs"),
     psm: int = typer.Option(3, help="Tesseract PSM"),
     lang: str = typer.Option("eng", help="Tesseract language"),
     box_inflate: int = typer.Option(2, help="Inflate redaction boxes (px)"),
-    mode: str = typer.Option("redact", help="Mode: redact | label (pseudonymize overlay)"),
-    preprocess: bool = typer.Option(True, "--preprocess/--no-preprocess", help="Enhance OCR via preprocessing"),
-    deskew: bool = typer.Option(True, "--deskew/--no-deskew", help="Deskew pages before OCR"),
-    binarize: bool = typer.Option(True, "--binarize/--no-binarize", help="Binarize images for OCR"),
-    auto_psm: bool = typer.Option(True, "--auto-psm/--no-auto-psm", help="Auto retry PSM to maximize tokens"),
+    mode: str = typer.Option(
+        "redact", help="Mode: redact | label (pseudonymize overlay)"
+    ),
+    preprocess: bool = typer.Option(
+        True, "--preprocess/--no-preprocess", help="Enhance OCR via preprocessing"
+    ),
+    deskew: bool = typer.Option(
+        True, "--deskew/--no-deskew", help="Deskew pages before OCR"
+    ),
+    binarize: bool = typer.Option(
+        True, "--binarize/--no-binarize", help="Binarize images for OCR"
+    ),
+    auto_psm: bool = typer.Option(
+        True, "--auto-psm/--no-auto-psm", help="Auto retry PSM to maximize tokens"
+    ),
 ):
     """Redact PII from PDFs or images and write a redacted PDF.
 
@@ -105,6 +130,7 @@ def run(
     print(f"[green]Redacted PDF:[/green] {output}")
     print(f"[green]Details:[/green] {str(meta_path)}")
 
+
 @app.command()
 def eval(
     truth_json: str = typer.Option(..., help="Ground-truth JSON path"),
@@ -120,11 +146,14 @@ def eval(
         Pipeline output meta.json as produced by the tool.
     """
     import orjson
+
     truth = orjson.loads(Path(truth_json).read_bytes())
-    meta  = orjson.loads(Path(meta_json).read_bytes())
+    meta = orjson.loads(Path(meta_json).read_bytes())
+
     # Simple coverage: count number of truth spans that overlap with any redacted candidate
-    def overlap(a,b):
+    def overlap(a, b):
         return not (a["end"] <= b["start"] or a["start"] >= b["end"])
+
     red_spans = []
     for p in meta["pages"]:
         cands = p.get("candidates", [])
@@ -136,6 +165,7 @@ def eval(
             tp += 1
     cov = tp / max(1, len(truth.get("spans", [])))
     print(f"Coverage: {cov:.3f} ({tp}/{len(truth.get('spans', []))})")
+
 
 @app.command()
 def ui(
@@ -166,32 +196,63 @@ def batch(
     input_dir: str = typer.Option(..., help="Input directory or glob pattern"),
     output_dir: str = typer.Option(..., help="Output directory for PDFs"),
     workers: int = typer.Option(2, help="Concurrent workers"),
-    spacy_model: str = typer.Option("en_core_web_lg", help="spaCy model name (or 'auto')"),
-    use_spacy: bool = typer.Option(True, "--use-spacy/--no-use-spacy", help="Enable spaCy NER detection"),
+    spacy_model: str = typer.Option(
+        "en_core_web_lg", help="spaCy model name (or 'auto')"
+    ),
+    use_spacy: bool = typer.Option(
+        True, "--use-spacy/--no-use-spacy", help="Enable spaCy NER detection"
+    ),
     use_llm: bool = typer.Option(False, help="Use Ollama LLM confirmation"),
-    use_llm_ner: bool = typer.Option(False, help="Use LLM few-shot NER (instead of spaCy)"),
+    use_llm_ner: bool = typer.Option(
+        False, help="Use LLM few-shot NER (instead of spaCy)"
+    ),
     llm_model: str = typer.Option("gpt-oss:20b", help="Ollama model name"),
-    llm_ner_model: Optional[str] = typer.Option(None, help="Override model name for LLM NER"),
-    prompt_path: Optional[str] = typer.Option(None, help="Path to prompts/pii_audit.jsonl"),
-    llm_ner_prompt: Optional[str] = typer.Option(None, help="Path to prompts/ner_fewshot.jsonl for LLM NER"),
+    llm_ner_model: Optional[str] = typer.Option(
+        None, help="Override model name for LLM NER"
+    ),
+    prompt_path: Optional[str] = typer.Option(
+        None, help="Path to prompts/pii_audit.jsonl"
+    ),
+    llm_ner_prompt: Optional[str] = typer.Option(
+        None, help="Path to prompts/ner_fewshot.jsonl for LLM NER"
+    ),
     policy: Optional[str] = typer.Option(None, help="Policy name or YAML path"),
     dpi: int = typer.Option(400, help="Rasterization DPI for PDFs"),
     psm: int = typer.Option(3, help="Tesseract PSM"),
     lang: str = typer.Option("eng", help="Tesseract language"),
     box_inflate: int = typer.Option(2, help="Inflate redaction boxes (px)"),
-    mode: str = typer.Option("redact", help="Mode: redact | label (pseudonymize overlay)"),
-    preprocess: bool = typer.Option(True, "--preprocess/--no-preprocess", help="Enhance OCR via preprocessing"),
-    deskew: bool = typer.Option(True, "--deskew/--no-deskew", help="Deskew pages before OCR"),
-    binarize: bool = typer.Option(True, "--binarize/--no-binarize", help="Binarize images for OCR"),
-    auto_psm: bool = typer.Option(True, "--auto-psm/--no-auto-psm", help="Auto retry PSM to maximize tokens"),
+    mode: str = typer.Option(
+        "redact", help="Mode: redact | label (pseudonymize overlay)"
+    ),
+    preprocess: bool = typer.Option(
+        True, "--preprocess/--no-preprocess", help="Enhance OCR via preprocessing"
+    ),
+    deskew: bool = typer.Option(
+        True, "--deskew/--no-deskew", help="Deskew pages before OCR"
+    ),
+    binarize: bool = typer.Option(
+        True, "--binarize/--no-binarize", help="Binarize images for OCR"
+    ),
+    auto_psm: bool = typer.Option(
+        True, "--auto-psm/--no-auto-psm", help="Auto retry PSM to maximize tokens"
+    ),
 ):
     """Batch process multiple inputs concurrently."""
     from glob import glob
+
     files = []
     p = Path(input_dir)
     if p.exists() and p.is_dir():
         for fp in p.iterdir():
-            if fp.suffix.lower() in {".pdf", ".png", ".jpg", ".jpeg", ".tif", ".tiff", ".bmp"}:
+            if fp.suffix.lower() in {
+                ".pdf",
+                ".png",
+                ".jpg",
+                ".jpeg",
+                ".tif",
+                ".tiff",
+                ".bmp",
+            }:
                 files.append(str(fp))
     else:
         files = glob(input_dir)

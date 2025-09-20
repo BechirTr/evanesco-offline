@@ -47,7 +47,9 @@ class Policy:
     def should_redact(self, category: str) -> bool:
         """Return True if the given category should be redacted under this policy."""
         c = (category or "").upper()
-        if self.denied_categories and c in set(x.upper() for x in self.denied_categories):
+        if self.denied_categories and c in set(
+            x.upper() for x in self.denied_categories
+        ):
             return False
         if self.allowed_categories is not None:
             return c in set(x.upper() for x in self.allowed_categories)

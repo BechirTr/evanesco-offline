@@ -45,18 +45,28 @@ def write_audit(
     for p in pages:
         cats = {}
         for bi in p.get("boxes", []):
-            cats[bi.get("category", "OTHER")] = cats.get(bi.get("category", "OTHER"), 0) + 1
-        page_summaries.append({
-            "page_index": p.get("page_index"),
-            "boxes": int(p.get("boxes_applied", 0)),
-            "by_category": cats,
-        })
+            cats[bi.get("category", "OTHER")] = (
+                cats.get(bi.get("category", "OTHER"), 0) + 1
+            )
+        page_summaries.append(
+            {
+                "page_index": p.get("page_index"),
+                "boxes": int(p.get("boxes_applied", 0)),
+                "by_category": cats,
+            }
+        )
 
     # Aggregate LLM meta across pages
     llm_pages = 0
     llm_items = 0
     llm_model = None
-    llm_metrics = {"eval_count": 0, "prompt_eval_count": 0, "eval_duration": 0, "prompt_eval_duration": 0, "total_duration": 0}
+    llm_metrics = {
+        "eval_count": 0,
+        "prompt_eval_count": 0,
+        "eval_duration": 0,
+        "prompt_eval_duration": 0,
+        "total_duration": 0,
+    }
     for p in result.get("pages", []):
         lj = p.get("llm_json") or {}
         if lj:
@@ -107,7 +117,11 @@ def write_audit(
     data_bytes = orjson.dumps(record)
     if key:
         sig = hmac.new(key.encode("utf-8"), data_bytes, hashlib.sha256).hexdigest()
-        record["hmac"] = {"alg": "HMAC-SHA256", "key_hint": "env:EVANESCO_HMAC_KEY", "value": sig}
+        record["hmac"] = {
+            "alg": "HMAC-SHA256",
+            "key_hint": "env:EVANESCO_HMAC_KEY",
+            "value": sig,
+        }
 
     audit_path.write_bytes(orjson.dumps(record, option=orjson.OPT_INDENT_2))
     return audit_path

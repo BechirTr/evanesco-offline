@@ -55,7 +55,16 @@ def _run_pipeline(
     binarize_flag: bool,
     auto_psm_flag: bool,
     progress: Any = None,
-) -> Tuple[str | None, str | None, str | None, str | None, Dict[str, Any], Dict[str, Any], Dict[str, Any], Dict[str, Any]]:
+) -> Tuple[
+    str | None,
+    str | None,
+    str | None,
+    str | None,
+    Dict[str, Any],
+    Dict[str, Any],
+    Dict[str, Any],
+    Dict[str, Any],
+]:
     """Execute the anonymization pipeline and return output artifacts.
 
     Parameters
@@ -101,15 +110,24 @@ def _run_pipeline(
     if progress is None:
         try:
             import gradio as gr  # type: ignore
+
             progress = gr.Progress(track_tqdm=True)
         except Exception:
+
             class _No:
                 def __call__(self, *a, **k):
                     return None
+
             progress = _No()
 
     if input_file is None:
-        return None, None, None, None, {"status": "error", "message": "Please upload a PDF or image."}
+        return (
+            None,
+            None,
+            None,
+            None,
+            {"status": "error", "message": "Please upload a PDF or image."},
+        )
 
     in_path = Path(input_file.name)
     # Write output into a temp dir per invocation
@@ -119,7 +137,9 @@ def _run_pipeline(
     cand_csv = out_dir / f"{in_path.stem}.candidates.csv"
     boxes_csv = out_dir / f"{in_path.stem}.boxes.csv"
 
-    eff_policy = (policy_custom or "").strip() or (policy_dropdown or "").strip() or None
+    eff_policy = (
+        (policy_custom or "").strip() or (policy_dropdown or "").strip() or None
+    )
     spacy_model = (spacy_model or "").strip()
     cfg = RunConfig(
         lang=lang,
@@ -148,7 +168,9 @@ def _run_pipeline(
     try:
         progress(0.05, desc="Starting pipeline")
         res = process_path(str(in_path), str(out_pdf), cfg)
-        out_meta.write_bytes(__import__("orjson").dumps(res, option=__import__("orjson").OPT_INDENT_2))
+        out_meta.write_bytes(
+            __import__("orjson").dumps(res, option=__import__("orjson").OPT_INDENT_2)
+        )
         pages = res.get("pages", [])
         total_boxes = sum(p.get("boxes_applied", 0) for p in pages)
         summary = {
@@ -163,21 +185,30 @@ def _run_pipeline(
             idx = p.get("page_index")
             lj = p.get("llm_json") or {}
             for it in lj.get("items", []):
-                explain_rows.append({
-                    "page": idx,
-                    "text": it.get("text"),
-                    "start": it.get("start"),
-                    "end": it.get("end"),
-                    "category": it.get("category"),
-                    "redact": it.get("redact"),
-                    "score": it.get("score"),
-                    "why": it.get("why"),
-                })
+                explain_rows.append(
+                    {
+                        "page": idx,
+                        "text": it.get("text"),
+                        "start": it.get("start"),
+                        "end": it.get("end"),
+                        "category": it.get("category"),
+                        "redact": it.get("redact"),
+                        "score": it.get("score"),
+                        "why": it.get("why"),
+                    }
+                )
         explain = {"items": explain_rows}
         # Previews and performance summaries
         previews = [p.get("preview_path") for p in pages if p.get("preview_path")]
         perf_pages = []
-        agg = {"ocr": 0.0, "detect": 0.0, "llm": 0.0, "align": 0.0, "redact": 0.0, "total": 0.0}
+        agg = {
+            "ocr": 0.0,
+            "detect": 0.0,
+            "llm": 0.0,
+            "align": 0.0,
+            "redact": 0.0,
+            "total": 0.0,
+        }
         n = 0
         for p in pages:
             tm = p.get("timings") or {}
@@ -188,49 +219,81 @@ def _run_pipeline(
                     if k in tm and tm[k] is not None:
                         agg[k] += float(tm[k])
                 n += 1
-        perf = {"per_page": perf_pages, "summary": {k: (v / max(1, n)) for k, v in agg.items()}, "pages": n}
+        perf = {
+            "per_page": perf_pages,
+            "summary": {k: (v / max(1, n)) for k, v in agg.items()},
+            "pages": n,
+        }
         # Optionally materialize review CSVs
         out_cand, out_boxes = None, None
         if generate_review:
             try:
                 import pandas as pd  # type: ignore
+
                 rows = []
                 for p in pages:
                     for c in p.get("candidates", []):
-                        rows.append({
-                            "page_index": p.get("page_index"),
-                            "start": c.get("start"),
-                            "end": c.get("end"),
-                            "text": c.get("text"),
-                            "label": c.get("label"),
-                            "source": c.get("source"),
-                        })
+                        rows.append(
+                            {
+                                "page_index": p.get("page_index"),
+                                "start": c.get("start"),
+                                "end": c.get("end"),
+                                "text": c.get("text"),
+                                "label": c.get("label"),
+                                "source": c.get("source"),
+                            }
+                        )
                 if rows:
                     pd.DataFrame(rows).to_csv(cand_csv, index=False)
                     out_cand = str(cand_csv)
                 # Boxes info
                 brow = []
                 for p in pages:
-                    for b in (p.get("boxes") or []):
+                    for b in p.get("boxes") or []:
                         x, y, w, h = b.get("box", (0, 0, 0, 0))
-                        brow.append({
-                            "page_index": p.get("page_index"),
-                            "x": x, "y": y, "w": w, "h": h,
-                            "category": b.get("category"),
-                            "source": b.get("source"),
-                            "text": b.get("text"),
-                        })
+                        brow.append(
+                            {
+                                "page_index": p.get("page_index"),
+                                "x": x,
+                                "y": y,
+                                "w": w,
+                                "h": h,
+                                "category": b.get("category"),
+                                "source": b.get("source"),
+                                "text": b.get("text"),
+                            }
+                        )
                 if brow:
                     pd.DataFrame(brow).to_csv(boxes_csv, index=False)
                     out_boxes = str(boxes_csv)
                 # LLM explain CSV
                 if explain_rows:
-                    pd.DataFrame(explain_rows).to_csv(out_dir / f"{in_path.stem}.llm_items.csv", index=False)
+                    pd.DataFrame(explain_rows).to_csv(
+                        out_dir / f"{in_path.stem}.llm_items.csv", index=False
+                    )
             except Exception:
                 pass
-        return str(out_pdf), str(out_meta), out_cand, out_boxes, summary, explain, {"previews": previews}, perf
+        return (
+            str(out_pdf),
+            str(out_meta),
+            out_cand,
+            out_boxes,
+            summary,
+            explain,
+            {"previews": previews},
+            perf,
+        )
     except Exception as e:
-        return None, None, None, None, {"status": "error", "message": str(e)}, {"items": []}, {"previews": []}, {"per_page": [], "summary": {}}
+        return (
+            None,
+            None,
+            None,
+            None,
+            {"status": "error", "message": str(e)},
+            {"items": []},
+            {"previews": []},
+            {"per_page": [], "summary": {}},
+        )
 
 
 def build_interface():
@@ -253,7 +316,10 @@ def build_interface():
         """)
 
         with gr.Row():
-            file_in = gr.File(label="PDF or image", file_types=[".pdf", ".png", ".jpg", ".jpeg", ".tif", ".tiff"],)
+            file_in = gr.File(
+                label="PDF or image",
+                file_types=[".pdf", ".png", ".jpg", ".jpeg", ".tif", ".tiff"],
+            )
 
         with gr.Accordion("Detection & Policy", open=True):
             with gr.Row():
@@ -263,32 +329,62 @@ def build_interface():
             with gr.Row():
                 use_llm = gr.Checkbox(value=True, label="Use Ollama LLM confirmation")
                 llm_model = gr.Textbox(value="gpt-oss:20b", label="LLM model")
-                llm_url = gr.Textbox(value="http://localhost:11434/api/generate", label="Ollama URL")
+                llm_url = gr.Textbox(
+                    value="http://localhost:11434/api/generate", label="Ollama URL"
+                )
                 prompt_path = gr.Textbox(value="", label="Prompt path (optional)")
             with gr.Row():
-                use_llm_ner = gr.Checkbox(value=False, label="Use LLM NER (few-shot instead of spaCy)")
+                use_llm_ner = gr.Checkbox(
+                    value=False, label="Use LLM NER (few-shot instead of spaCy)"
+                )
                 llm_ner_prompt = gr.Textbox(value="", label="LLM NER prompt (optional)")
             with gr.Row():
-                policy = gr.Dropdown(choices=["", "default", "gdpr", "hipaa", "pci"], value="", label="Policy (or leave blank)")
-                custom_policy = gr.Textbox(value="", label="Custom policy path (overrides dropdown)")
+                policy = gr.Dropdown(
+                    choices=["", "default", "gdpr", "hipaa", "pci"],
+                    value="",
+                    label="Policy (or leave blank)",
+                )
+                custom_policy = gr.Textbox(
+                    value="", label="Custom policy path (overrides dropdown)"
+                )
 
         with gr.Accordion("OCR + Redaction", open=False):
             with gr.Row():
                 lang = gr.Textbox(value="eng", label="Tesseract language")
-                dpi = gr.Slider(value=400, minimum=72, maximum=600, step=12, label="PDF rasterization DPI")
-                psm = gr.Slider(value=3, minimum=0, maximum=13, step=1, label="Tesseract PSM")
-                inflate = gr.Slider(value=2, minimum=0, maximum=10, step=1, label="Box inflate (px)")
-                mode = gr.Radio(choices=["redact", "label"], value="redact", label="Mode")
+                dpi = gr.Slider(
+                    value=400,
+                    minimum=72,
+                    maximum=600,
+                    step=12,
+                    label="PDF rasterization DPI",
+                )
+                psm = gr.Slider(
+                    value=3, minimum=0, maximum=13, step=1, label="Tesseract PSM"
+                )
+                inflate = gr.Slider(
+                    value=2, minimum=0, maximum=10, step=1, label="Box inflate (px)"
+                )
+                mode = gr.Radio(
+                    choices=["redact", "label"], value="redact", label="Mode"
+                )
         with gr.Accordion("OCR Enhancements", open=False):
             with gr.Row():
-                enhance = gr.Checkbox(value=True, label="Preprocess (denoise + binarize)")
+                enhance = gr.Checkbox(
+                    value=True, label="Preprocess (denoise + binarize)"
+                )
                 deskew = gr.Checkbox(value=True, label="Deskew")
                 binarize = gr.Checkbox(value=True, label="Binarize")
                 auto_psm = gr.Checkbox(value=True, label="Auto-PSM retry")
         with gr.Accordion("Review & Artifacts", open=False):
-            generate_review = gr.Checkbox(value=True, label="Generate review CSVs (candidates, boxes, LLM items)")
-            generate_previews = gr.Checkbox(value=True, label="Generate preview overlays (kept/rejected)")
-            save_traces = gr.Checkbox(value=False, label="Save full LLM traces (prompt+response)")
+            generate_review = gr.Checkbox(
+                value=True, label="Generate review CSVs (candidates, boxes, LLM items)"
+            )
+            generate_previews = gr.Checkbox(
+                value=True, label="Generate preview overlays (kept/rejected)"
+            )
+            save_traces = gr.Checkbox(
+                value=False, label="Save full LLM traces (prompt+response)"
+            )
 
         run_btn = gr.Button("Anonymize", variant="primary")
 
@@ -302,10 +398,26 @@ def build_interface():
         with gr.Accordion("LLM Explainability", open=False):
             explain_json = gr.JSON(label="LLM items (with why/score)")
             with gr.Row():
-                why_page = gr.Slider(value=-1, minimum=-1, maximum=0, step=1, label="Page (-1=all)")
+                why_page = gr.Slider(
+                    value=-1, minimum=-1, maximum=0, step=1, label="Page (-1=all)"
+                )
                 why_cat = gr.Textbox(value="", label="Category filter (empty=all)")
-                why_dec = gr.Radio(choices=["all", "redact", "reject"], value="all", label="Decision")
-            why_table = gr.Dataframe(headers=["page","text","start","end","category","redact","score","why"], interactive=False)
+                why_dec = gr.Radio(
+                    choices=["all", "redact", "reject"], value="all", label="Decision"
+                )
+            why_table = gr.Dataframe(
+                headers=[
+                    "page",
+                    "text",
+                    "start",
+                    "end",
+                    "category",
+                    "redact",
+                    "score",
+                    "why",
+                ],
+                interactive=False,
+            )
         with gr.Accordion("Previews", open=False):
             previews_json = gr.JSON(visible=False)
             page_slider = gr.Slider(value=0, minimum=0, maximum=0, step=1, label="Page")
@@ -341,7 +453,16 @@ def build_interface():
                 generate_previews,
                 save_traces,
             ],
-            outputs=[out_pdf, out_meta, cand_out, boxes_out, summary, explain_json, previews_json, perf_json],
+            outputs=[
+                out_pdf,
+                out_meta,
+                cand_out,
+                boxes_out,
+                summary,
+                explain_json,
+                previews_json,
+                perf_json,
+            ],
         )
 
         # Wire preview controls
@@ -354,10 +475,16 @@ def build_interface():
 
         def _init_preview(previews: Dict[str, Any]):
             paths = (previews or {}).get("previews", [])
-            return gr.update(minimum=0, maximum=max(0, len(paths) - 1), value=0), _pick_preview(previews, 0)
+            return gr.update(
+                minimum=0, maximum=max(0, len(paths) - 1), value=0
+            ), _pick_preview(previews, 0)
 
-        previews_json.change(_init_preview, inputs=[previews_json], outputs=[page_slider, preview_img])
-        page_slider.change(_pick_preview, inputs=[previews_json, page_slider], outputs=[preview_img])
+        previews_json.change(
+            _init_preview, inputs=[previews_json], outputs=[page_slider, preview_img]
+        )
+        page_slider.change(
+            _pick_preview, inputs=[previews_json, page_slider], outputs=[preview_img]
+        )
 
         # Why viewer filtering
         def _filter_why(explain: Dict[str, Any], page: int, cat: str, dec: str):
@@ -373,10 +500,18 @@ def build_interface():
                     continue
                 if dec == "reject" and r:
                     continue
-                rows.append([
-                    it.get("page"), it.get("text"), it.get("start"), it.get("end"),
-                    it.get("category"), it.get("redact"), it.get("score"), it.get("why"),
-                ])
+                rows.append(
+                    [
+                        it.get("page"),
+                        it.get("text"),
+                        it.get("start"),
+                        it.get("end"),
+                        it.get("category"),
+                        it.get("redact"),
+                        it.get("score"),
+                        it.get("why"),
+                    ]
+                )
             return rows
 
         def _init_why(explain: Dict[str, Any]):
@@ -387,12 +522,28 @@ def build_interface():
                     max_page = max(max_page, int(it.get("page", 0)))
                 except Exception:
                     pass
-            return gr.update(minimum=-1, maximum=max_page, value=-1), _filter_why(explain, -1, "", "all")
+            return gr.update(minimum=-1, maximum=max_page, value=-1), _filter_why(
+                explain, -1, "", "all"
+            )
 
-        explain_json.change(_init_why, inputs=[explain_json], outputs=[why_page, why_table])
-        why_page.change(_filter_why, inputs=[explain_json, why_page, why_cat, why_dec], outputs=[why_table])
-        why_cat.change(_filter_why, inputs=[explain_json, why_page, why_cat, why_dec], outputs=[why_table])
-        why_dec.change(_filter_why, inputs=[explain_json, why_page, why_cat, why_dec], outputs=[why_table])
+        explain_json.change(
+            _init_why, inputs=[explain_json], outputs=[why_page, why_table]
+        )
+        why_page.change(
+            _filter_why,
+            inputs=[explain_json, why_page, why_cat, why_dec],
+            outputs=[why_table],
+        )
+        why_cat.change(
+            _filter_why,
+            inputs=[explain_json, why_page, why_cat, why_dec],
+            outputs=[why_table],
+        )
+        why_dec.change(
+            _filter_why,
+            inputs=[explain_json, why_page, why_cat, why_dec],
+            outputs=[why_table],
+        )
 
         gr.Markdown(
             """
@@ -405,7 +556,9 @@ def build_interface():
     return demo
 
 
-def launch(server_name: str = "0.0.0.0", server_port: int = 7860, inbrowser: bool = False) -> None:
+def launch(
+    server_name: str = "0.0.0.0", server_port: int = 7860, inbrowser: bool = False
+) -> None:
     """Launch the Gradio UI.
 
     Parameters
