@@ -1,0 +1,14 @@
+name: hipaa
+metadata:
+  jurisdiction: US
+  description: HIPAA Safe Harbor identifiers
+allowed_categories:
+  - PERSON
+  - DATE
+  - PHONE
+  - EMAIL
+  - CREDIT_CARD
+  - GPE
+  - LOC
+default_redact: true
+

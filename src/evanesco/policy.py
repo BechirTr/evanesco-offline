@@ -8,8 +8,10 @@ selected at runtime via `RunConfig.policy_path`.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Union
 from pathlib import Path
+from importlib import resources
+from importlib.resources.abc import Traversable
 import orjson
 
 try:
@@ -61,18 +63,29 @@ class Policy:
         }
 
     @staticmethod
-    def from_file(path: str | Path) -> "Policy":
-        p = Path(path)
-        if not p.exists():
-            raise FileNotFoundError(f"Policy file not found: {path}")
-        text = p.read_text(encoding="utf-8")
+    def from_file(path: Union[str, Path, Traversable]) -> "Policy":
+        text: str
+        stem: str
+        suffix: str
+
+        if isinstance(path, Traversable):
+            text = path.read_text(encoding="utf-8")
+            stem = Path(path.name).stem
+            suffix = Path(path.name).suffix.lower()
+        else:
+            p = Path(path)
+            if not p.exists():
+                raise FileNotFoundError(f"Policy file not found: {path}")
+            text = p.read_text(encoding="utf-8")
+            stem = p.stem
+            suffix = p.suffix.lower()
         data: Dict[str, Any]
-        if p.suffix.lower() in {".yaml", ".yml"} and yaml is not None:
+        if suffix in {".yaml", ".yml"} and yaml is not None:
             data = yaml.safe_load(text)  # type: ignore[no-redef]
         else:
             data = orjson.loads(text)
         return Policy(
-            name=data.get("name", p.stem),
+            name=data.get("name", stem),
             allowed_categories=data.get("allowed_categories"),
             denied_categories=data.get("denied_categories"),
             default_redact=bool(data.get("default_redact", True)),
@@ -80,12 +93,18 @@ class Policy:
         )
 
 
-def find_builtin_policy(name: str) -> Optional[Path]:
-    """Search repository for a builtin policy YAML by name and return its path."""
+def find_builtin_policy(name: str) -> Optional[Union[Path, Traversable]]:
+    """Locate a packaged builtin policy by name."""
+    try:
+        ref = resources.files("evanesco.data").joinpath("policies", f"{name}.yaml")
+        if ref.is_file():
+            return ref
+    except Exception:  # pragma: no cover - guard for frozen apps
+        pass
+    # Fallback: developer checkout layout
     for parent in Path(__file__).resolve().parents:
         cand = parent / ".." / ".." / "configs" / "policies" / f"{name}.yaml"
         cand = cand.resolve()
         if cand.exists():
             return cand
     return None
-

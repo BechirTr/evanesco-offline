@@ -5,6 +5,7 @@ confirmation via Ollama, geometric alignment and final redaction.
 """
 
 from typing import Optional, List, Dict, Any, Tuple
+from importlib import resources
 from dataclasses import dataclass
 from pydantic import BaseModel
 from pathlib import Path
@@ -182,7 +183,14 @@ def llm_ner_candidates(text: str, cfg: RunConfig) -> List[Dict[str, Any]]:
             cand = parent / "prompts" / "ner_fewshot.jsonl"
             if cand.exists():
                 return cand.read_text(encoding="utf-8")
-        # 3) fallback minimal system prompt
+        # 3) packaged fallback
+        try:
+            ref = resources.files("evanesco.data").joinpath("prompts", "ner_fewshot.jsonl")
+            if ref.is_file():
+                return ref.read_text(encoding="utf-8")
+        except Exception:
+            pass
+        # 4) fallback minimal system prompt
         return (
             "SYSTEM: You are a precise NER extractor.\n"
             "Return STRICT JSON: {items:[{text,start,end,label}]}. Use character offsets into the provided text.\n"
@@ -281,7 +289,14 @@ def llm_filter(text: str, cands: List[Dict[str, Any]], cfg: RunConfig) -> Dict[s
             cand = parent / "prompts" / "pii_audit.jsonl"
             if cand.exists():
                 return cand.read_text(encoding="utf-8")
-        # 3) fallback minimal system prompt
+        # 3) packaged fallback
+        try:
+            ref = resources.files("evanesco.data").joinpath("prompts", "pii_audit.jsonl")
+            if ref.is_file():
+                return ref.read_text(encoding="utf-8")
+        except Exception:
+            pass
+        # 4) fallback minimal system prompt
         return (
             "SYSTEM: You are a strict JSON generator for PII redaction.\n"
             "Return only JSON with keys: items (list of {text,start,end,redact,category}), notes.\n"

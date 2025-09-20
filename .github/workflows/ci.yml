@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+      - 'feature/**'
+  pull_request:
+    branches:
+      - main
+      - dev
+
+jobs:
+  lint-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install .[server]
+          python -m pip install ruff bandit safety pytest
+
+      - name: Lint (ruff format)
+        run: ruff format --check src tests
+
+      - name: Lint (ruff check)
+        run: ruff check src tests
+
+      - name: Security scan (Bandit)
+        run: bandit -r src -ll
+
+      - name: Dependency vulnerability scan (safety)
+        run: |
+          pip freeze > requirements.txt
+          safety check --bare --file requirements.txt
+
+      - name: Run unit tests
+        run: pytest --maxfail=1 --disable-warnings -q
