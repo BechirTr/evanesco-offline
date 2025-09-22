@@ -24,7 +24,9 @@ try:
 except Exception:
     version = "0.0.0"
 release = version
-
+source_suffix = [
+    ".md",
+]
 extensions = [
     "myst_parser",
     "sphinx.ext.autodoc",
