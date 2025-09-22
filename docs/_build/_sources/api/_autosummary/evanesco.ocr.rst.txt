@@ -4,11 +4,6 @@ evanesco.ocr
 .. automodule:: evanesco.ocr
 
    
-   
-   
-
-   
-   
    .. rubric:: Functions
 
    .. autosummary::
@@ -16,15 +11,3 @@ evanesco.ocr
       image_ocr_tsv
       pdf_to_images
    
-   
-
-   
-   
-   
-
-   
-   
-   
-
-
-

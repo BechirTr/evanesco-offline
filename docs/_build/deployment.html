@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Deployment on Kubernetes / OpenShift &mdash; Evanesco Offline 0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=a58bc63e"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Architecture" href="architecture.html" />
+    <link rel="prev" title="Usage" href="usage.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Evanesco Offline
+          </a>
+              <div class="version">
+                0.1.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Guide</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Deployment on Kubernetes / OpenShift</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#container-image">Container Image</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#runtime-environment-variables">Runtime Environment Variables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#probes">Probes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#kubernetes-manifests">Kubernetes Manifests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#network-tls">Network &amp; TLS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#observability">Observability</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#upgrade-workflow">Upgrade Workflow</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/index.html">API Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Evanesco Offline</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Deployment on Kubernetes / OpenShift</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/deployment.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="deployment-on-kubernetes-openshift">
+<h1>Deployment on Kubernetes / OpenShift<a class="headerlink" href="#deployment-on-kubernetes-openshift" title="Link to this heading"></a></h1>
+<p>Evanesco Offline now ships with container images and manifests that target
+managed clusters. This page outlines the recommended approach for production
+setups.</p>
+<section id="container-image">
+<h2>Container Image<a class="headerlink" href="#container-image" title="Link to this heading"></a></h2>
+<p>Build the image directly from the repository root:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span>ghcr.io/your-org/evanesco-offline:latest<span class="w"> </span>.
+</pre></div>
+</div>
+<p>The Dockerfile installs Poppler and Tesseract, exposes port <code class="docutils literal notranslate"><span class="pre">8000</span></code>, and runs the
+FastAPI service under a non-root user. Mount <code class="docutils literal notranslate"><span class="pre">/data</span></code> if you need to persist
+preview artefacts or audit logs beyond the container lifecycle.</p>
+</section>
+<section id="runtime-environment-variables">
+<h2>Runtime Environment Variables<a class="headerlink" href="#runtime-environment-variables" title="Link to this heading"></a></h2>
+<p>The API reads configuration from environment variables; the ConfigMap template
+(<code class="docutils literal notranslate"><span class="pre">deploy/kubernetes/configmap.yaml</span></code>) covers the common ones:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable</p></th>
+<th class="head"><p>Purpose</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">EVANESCO_API_TOKEN</span></code></p></td>
+<td><p>Bearer token required for <code class="docutils literal notranslate"><span class="pre">/redact</span></code> requests. Stored in a Kubernetes Secret.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">EVANESCO_API_CORS_ORIGINS</span></code></p></td>
+<td><p>Comma separated allow-list for browsers (e.g. the UI front-end).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">EVANESCO_READY_CHECK_*</span></code></p></td>
+<td><p>Enable readiness validation for OCR, spaCy, or LLM dependencies.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">EVANESCO_READY_SPACY_MODEL</span></code></p></td>
+<td><p>Model name used during readiness probing (<code class="docutils literal notranslate"><span class="pre">en_core_web_lg</span></code> by default).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">EVANESCO_READY_TESS_LANGS</span></code></p></td>
+<td><p>Required Tesseract language packs (comma separated).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">EVANESCO_LLM_URL</span></code></p></td>
+<td><p>Override the Ollama endpoint when the model runs outside the pod.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">EVANESCO_READY_WARN_ONLY</span></code></p></td>
+<td><p>When <code class="docutils literal notranslate"><span class="pre">true</span></code>, warnings during readiness (e.g. missing spaCy NER) still report ready.</p></td>
+</tr>
+</tbody>
+</table>
+<p>If you rely on the audit HMAC signature, inject <code class="docutils literal notranslate"><span class="pre">EVANESCO_HMAC_KEY</span></code> via a
+Secret and mount it alongside the API token.</p>
+</section>
+<section id="probes">
+<h2>Probes<a class="headerlink" href="#probes" title="Link to this heading"></a></h2>
+<p>The API exposes:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/health</span></code> – lightweight status (still unauthenticated)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/livez</span></code> – liveness probe endpoint</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/readyz</span></code> – readiness probe returning a JSON report; HTTP 503 on failures</p></li>
+</ul>
+<p>Kubernetes manifests wire these endpoints into standard probes to ensure pods
+only receive traffic when the runtime dependencies are satisfied.</p>
+</section>
+<section id="kubernetes-manifests">
+<h2>Kubernetes Manifests<a class="headerlink" href="#kubernetes-manifests" title="Link to this heading"></a></h2>
+<p>The manifests under <code class="docutils literal notranslate"><span class="pre">deploy/kubernetes/</span></code> provide an opinionated starting point:</p>
+<ol class="arabic">
+<li><p>Create a namespace and apply the ServiceAccount:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>oc<span class="w"> </span>new-project<span class="w"> </span>pii-redaction
+oc<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>deploy/kubernetes/serviceaccount.yaml
+</pre></div>
+</div>
+</li>
+<li><p>Apply the ConfigMap and Secret (replace the base64 placeholders first):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>oc<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>deploy/kubernetes/configmap.yaml
+oc<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>deploy/kubernetes/secret.yaml
+</pre></div>
+</div>
+</li>
+<li><p>Deploy the API and expose it:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>oc<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>deploy/kubernetes/deployment.yaml
+oc<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>deploy/kubernetes/service.yaml
+oc<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>deploy/kubernetes/route.yaml
+</pre></div>
+</div>
+</li>
+</ol>
+<p>Adjust the image reference, resource requests, and replicas to match your
+cluster sizing. The Deployment mounts an <code class="docutils literal notranslate"><span class="pre">emptyDir</span></code> at <code class="docutils literal notranslate"><span class="pre">/data</span></code>; replace this with
+a PersistentVolumeClaim if you need durable artefacts.</p>
+</section>
+<section id="network-tls">
+<h2>Network &amp; TLS<a class="headerlink" href="#network-tls" title="Link to this heading"></a></h2>
+<p>OpenShift Routes terminate TLS by default. For alternative ingress solutions,
+expose the Service through Ingress or a Service Mesh and terminate TLS at that
+layer. When the LLM endpoint runs in a separate namespace/cluster, enable
+mTLS or network policies to restrict traffic to the authorised service.</p>
+</section>
+<section id="observability">
+<h2>Observability<a class="headerlink" href="#observability" title="Link to this heading"></a></h2>
+<p>Enable Prometheus scraping by annotating the Service:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">annotations</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">prometheus.io/scrape</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;true&quot;</span>
+<span class="w">    </span><span class="nt">prometheus.io/port</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;8000&quot;</span>
+</pre></div>
+</div>
+<p>Logs are structured JSON; forward them to your aggregation stack (e.g. Loki or
+Elastic) and correlate with <code class="docutils literal notranslate"><span class="pre">/metrics</span></code> counters for redaction throughput.</p>
+</section>
+<section id="upgrade-workflow">
+<h2>Upgrade Workflow<a class="headerlink" href="#upgrade-workflow" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>Build and push the image.</p></li>
+<li><p>Update the Deployment image tag and apply.</p></li>
+<li><p>Observe <code class="docutils literal notranslate"><span class="pre">/readyz</span></code> until pods report ready and the Route shows success.</p></li>
+<li><p>Optionally run <code class="docutils literal notranslate"><span class="pre">evanesco</span> <span class="pre">run</span></code> against a test document via the API to verify.</p></li>
+</ol>
+<p>Rolling updates with <code class="docutils literal notranslate"><span class="pre">maxUnavailable:</span> <span class="pre">0</span></code> ensure zero downtime while new pods
+pass readiness checks before receiving traffic.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="usage.html" class="btn btn-neutral float-left" title="Usage" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="architecture.html" class="btn btn-neutral float-right" title="Architecture" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Evanesco contributors.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

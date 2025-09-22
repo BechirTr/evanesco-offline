@@ -4,11 +4,6 @@ evanesco.cli
 .. automodule:: evanesco.cli
 
    
-   
-   
-
-   
-   
    .. rubric:: Functions
 
    .. autosummary::
@@ -18,15 +13,3 @@ evanesco.cli
       run
       ui
    
-   
-
-   
-   
-   
-
-   
-   
-   
-
-
-

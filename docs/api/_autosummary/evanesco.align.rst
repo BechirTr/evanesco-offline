@@ -4,11 +4,6 @@ evanesco.align
 .. automodule:: evanesco.align
 
    
-   
-   
-
-   
-   
    .. rubric:: Functions
 
    .. autosummary::
@@ -16,15 +11,3 @@ evanesco.align
       spans_to_box_info
       spans_to_boxes
    
-   
-
-   
-   
-   
-
-   
-   
-   
-
-
-

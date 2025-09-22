@@ -4,11 +4,6 @@ evanesco.core
 .. automodule:: evanesco.core
 
    
-   
-   
-
-   
-   
    .. rubric:: Functions
 
    .. autosummary::
@@ -19,10 +14,6 @@ evanesco.core
       process_path
       process_pdf
    
-   
-
-   
-   
    .. rubric:: Classes
 
    .. autosummary::
@@ -30,11 +21,3 @@ evanesco.core
       PageResult
       RunConfig
    
-   
-
-   
-   
-   
-
-
-

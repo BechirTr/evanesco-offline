@@ -4,15 +4,6 @@ evanesco.llm
 .. automodule:: evanesco.llm
 
    
-   
-   
-
-   
-   
-   
-
-   
-   
    .. rubric:: Classes
 
    .. autosummary::
@@ -20,11 +11,3 @@ evanesco.llm
       LLMClient
       OllamaClient
    
-   
-
-   
-   
-   
-
-
-

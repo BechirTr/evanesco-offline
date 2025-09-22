@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "evanesco-offline"
-version = "0.1.0"
+version = "0.1.1"
 description = "Fully local/offline document anonymization (OCR + spaCy/regex + optional Ollama GPT-OSS)"
 authors = [{name="You"}]
 readme = "README.md"

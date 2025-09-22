@@ -97,6 +97,26 @@ evanesco run -i input.pdf -o out.pdf \
   --auto-psm/--no-auto-psm \
   --dpi 450 --psm 6
 ```
+
+## Multilingual (French)
+
+spaCy supports many languages including French. For French documents:
+
+- Install the French spaCy model: `python -m spacy download fr_core_news_lg`
+- Ensure Tesseract has French language data (usually `fra`); on Debian/Ubuntu: `apt-get install tesseract-ocr-fra`
+- Run with French OCR language and model:
+
+```
+evanesco run -i input.pdf -o out.pdf --lang fra --spacy-model fr_core_news_lg
+```
+
+You can also let the CLI pick a model based on `--lang` by using auto:
+
+```
+evanesco run -i input.pdf -o out.pdf --lang fra --spacy-model auto
+```
+
+In the UI, set “Tesseract language” to `fra` and “spaCy model” to `fr_core_news_lg`.
 ```
 
 ## REST API

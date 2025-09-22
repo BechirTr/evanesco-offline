@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: evanesco-offline
-Version: 0.1.0
+Version: 0.1.1
 Summary: Fully local/offline document anonymization (OCR + spaCy/regex + optional Ollama GPT-OSS)
 Author: You
 Requires-Python: >=3.10

@@ -1,13 +1,8 @@
-﻿evanesco.redact
+evanesco.redact
 ===============
 
 .. automodule:: evanesco.redact
 
-   
-   
-   
-
-   
    
    .. rubric:: Functions
 
@@ -18,15 +13,3 @@
       redact_page_with_labels
       save_pdf
    
-   
-
-   
-   
-   
-
-   
-   
-   
-
-
-

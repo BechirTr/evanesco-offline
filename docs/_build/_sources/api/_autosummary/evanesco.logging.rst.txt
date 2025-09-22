@@ -4,20 +4,11 @@ evanesco.logging
 .. automodule:: evanesco.logging
 
    
-   
-   
-
-   
-   
    .. rubric:: Functions
 
    .. autosummary::
    
       get_logger
-   
-   
-
-   
    
    .. rubric:: Classes
 
@@ -25,11 +16,3 @@ evanesco.logging
    
       JsonFormatter
    
-   
-
-   
-   
-   
-
-
-

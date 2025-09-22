@@ -4,11 +4,6 @@ evanesco.ui
 .. automodule:: evanesco.ui
 
    
-   
-   
-
-   
-   
    .. rubric:: Functions
 
    .. autosummary::
@@ -16,15 +11,3 @@ evanesco.ui
       build_interface
       launch
    
-   
-
-   
-   
-   
-
-   
-   
-   
-
-
-

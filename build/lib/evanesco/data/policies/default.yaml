@@ -1,0 +1,15 @@
+name: default
+metadata:
+  description: Default broad redaction policy
+allowed_categories:
+  - PERSON
+  - ORG
+  - GPE
+  - LOC
+  - DATE
+  - EMAIL
+  - PHONE
+  - IBAN
+  - CREDIT_CARD
+default_redact: true
+
