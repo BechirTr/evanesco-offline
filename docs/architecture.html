@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Evanesco Offline — Pipeline Architecture</title>
+    <title>Evanesco Offline - Pipeline Architecture</title>
     <style>
       :root { color-scheme: light dark; }
       body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; margin: 24px; line-height: 1.35; }
@@ -21,72 +21,101 @@
   </head>
   <body>
     <div class="wrap">
-      <h1>Evanesco Offline — Pipeline Architecture</h1>
+      <h1>Evanesco Offline - Pipeline Architecture</h1>
       <p class="note">
-        End‑to‑end dataflow of the local PII redaction pipeline (OCR + spaCy/regex + optional Ollama) with layout‑preserving PDF output.
-        If viewing fully offline, load Mermaid locally or paste the graph content into a Mermaid‑enabled editor.
+        End-to-end dataflow for the offline redaction pipeline: ingestion, OCR, detection, policy and LLM confirmation, alignment, rendering, and artifact export.
+        When browsing fully offline, install Mermaid locally or paste the graph into a Mermaid-capable editor.
       </p>
 
       <div class="mermaid">
 graph TD
-  %% Minimal styles
+  %% Styles
   classDef external fill:#f3f3f3,stroke:#888,color:#222
   classDef action fill:#e8f1ff,stroke:#4a90e2,color:#111
   classDef store fill:#fff1e0,stroke:#e67e22,color:#333
 
-  %% Entry / Config
-  I[CLI evanesco run]:::external --> Cfg[RunConfig]:::store
-  I --> InPath[Input Path]
+  Entry[CLI / UI / API]:::external --> Config[RunConfig + Policy]:::store;
+  Entry --> Source[Input Documents]:::store;
+
+  %% Pipeline flow
 
   subgraph Ingestion
-    InPath -->|PDF| Raster{Rasterize}
-    InPath -->|Images| ImgList[Page Images]:::store
-    Raster -->|pdf2image Poppler| ImgList
-    Raster -->|PyMuPDF fallback| ImgList
+    Source -->|PDF| Rasterize[Poppler / PyMuPDF Rasterize]:::action;
+    Source -->|Images or Dir| Pages[Page Images]:::store;
+    Rasterize --> Pages;
+    Config --> Preprocess[Enhance / Deskew / Binarize]:::action;
+    Pages --> Preprocess;
+    Preprocess --> OCR[Tesseract OCR -> TSV]:::action;
   end
 
-  subgraph PerPagePipeline
-    direction LR
-    ImgList --> OCR[Tesseract OCR]:::action
-    OCR --> Text[Reconstruct Text]:::action
-    Text --> Spa[spaCy NER]:::action
-    Text --> Re[Regex patterns]:::action
-    Spa --> Cand[Candidates]:::store
-    Re  --> Cand
+  OCR --> TextStream[Reconstructed Text Stream]:::store;
+  OCR --> DebugExport[OCR Debug Export]:::action;
+  DebugExport --> OcrArtifacts[artifacts/<run>.ocr.zip + all_text.txt]:::store;
 
-    Cand -->|optional| LLM[Ollama gpt_oss_20b]:::action
-    LLM --> Dec[LLM Decisions]:::store
-    Cand -->|no LLM| Final[Final Spans]:::store
-    Dec  --> Final
-
-    OCR  --> Align[Align spans to OCR boxes]:::action
-    Final --> Align
-    Align --> Boxes[PII Boxes]:::store
-    Boxes --> Redact[Draw boxes]:::action
-    Redact --> RedPages[Redacted Pages]:::store
+  subgraph Detection
+    TextStream --> Spa[spaCy NER]:::action;
+    TextStream --> Regex[Regex Rules]:::action;
+    TextStream -->|optional| LLMNER[LLM Few-shot NER]:::action;
+    Spa --> Candidates[Candidate Spans]:::store;
+    Regex --> Candidates;
+    LLMNER --> Candidates;
   end
 
-  subgraph Output
-    RedPages --> PDF[img2pdf Redacted PDF]:::action
-    Cand --> Meta[meta json]:::store
+  subgraph PolicyConfirmation [Policy & Confirmation]
+    Candidates --> PolicyFilter[Policy Filter]:::action;
+    Config --> PolicyFilter;
+    PolicyFilter --> Prompt[Prompt Builder]:::action;
+    Prompt -->|optional| ConfirmLLM[Ollama Confirmation]:::action;
+    ConfirmLLM --> Decisions[LLM Decisions]:::store;
+    PolicyFilter --> Deterministic[Deterministic Approvals]:::store;
+    Decisions --> Deterministic;
   end
 
-  subgraph ServicesDeps
-    T[Tesseract]:::external
-    Pop[Poppler]:::external
-    Oll[Ollama Server]:::external
+  subgraph AlignmentRendering [Alignment & Rendering]
+    OCR --> Align[Align Spans to OCR Boxes]:::action;
+    Deterministic --> Align;
+    Align --> Boxes[Accepted Boxes]:::store;
+    Candidates --> Rejected[Rejected Spans]:::store;
+    Align --> RejectedBoxes[Rejected Boxes]:::store;
+    Config --> RenderMode[Render Mode - blackout or label]:::action;
+    RenderMode --> Render[Render Redactions]:::action;
+    Boxes --> Render;
+    Render --> RedPages[Redacted Page Images]:::store;
+    Render --> Previews[Preview Overlays]:::store;
   end
 
-  OCR --- T
-  Raster --- Pop
-  LLM --- Oll
+  RedPages --> PdfTask[img2pdf Assembly]:::action;
+  PdfTask --> OutputPdf[Redacted PDF]:::store;
+  Previews --> PreviewDir[<run>.previews/]:::store;
+
+  subgraph Outputs
+    Deterministic --> Meta[<run>.meta.json]:::store;
+    Candidates --> ReviewCsv[Review CSVs]:::store;
+    Decisions --> Traces[Optional LLM Traces]:::store;
+    DebugExport --> OcrArtifacts;
+    Config --> AuditWriter[Audit Writer]:::action;
+    AuditWriter --> AuditJson[<run>.audit.json]:::store;
+    Meta --> Summary[Per-page Timings & Stats]:::store;
+  end
+
+  subgraph ExternalDeps
+    Tess[Tesseract OCR]:::external;
+    PopplerSvc[Poppler / PyMuPDF]:::external;
+    Oll[Ollama Server]:::external;
+  end
+
+  OCR --- Tess;
+  Rasterize --- PopplerSvc;
+  ConfirmLLM --- Oll;
+  LLMNER --- Oll;
       </div>
 
       <p class="note">
         Notes:
-        <br/>• Set <code>POPPLER_PATH</code> if Poppler binaries aren’t on PATH. If Poppler is unavailable, the pipeline falls back to <code>PyMuPDF</code>.
-        <br/>• spaCy model resolution tries requested name → <code>en_core_web_sm</code> → <code>spacy.blank('en')</code>; also supports direct package import.
-        <br/>• LLM step reads a prompt from <code>--prompt-path</code> or auto-discovers <code>prompts/pii_audit.jsonl</code>, with a built‑in minimal fallback.
+        <br/>- Set <code>POPPLER_PATH</code> if Poppler binaries are not on PATH. The pipeline falls back to <code>PyMuPDF</code> automatically.
+        <br/>- Policies can be selected by name (<code>gdpr</code>, <code>hipaa</code>, <code>pci</code>) or by pointing at a YAML file. They gate categories before confirmation.
+        <br/>- The LLM step reads prompts from <code>--prompt-path</code> or auto-discovers JSONL files in <code>prompts/</code> with a built-in fallback prompt.
+        <br/>- Enable <code>export_ocr_debug</code>, <code>generate_previews</code>, or <code>explain_traces</code> to surface the artifacts highlighted in the diagram.
       </p>
     </div>
   </body>

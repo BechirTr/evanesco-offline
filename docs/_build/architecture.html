@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Architecture &mdash; Evanesco Offline 0.1.1 documentation</title>
+  <title>Architecture &mdash; Evanesco Offline 0.1.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
 
@@ -15,7 +15,7 @@
   
         <script src="_static/jquery.js?v=5d32c60e"></script>
         <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=a58bc63e"></script>
+        <script src="_static/documentation_options.js?v=92734c54"></script>
         <script src="_static/doctools.js?v=9a2dae69"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
@@ -37,7 +37,7 @@
             Evanesco Offline
           </a>
               <div class="version">
-                0.1.1
+                0.1.2
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -51,7 +51,18 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="deployment.html">Deployment on Kubernetes / OpenShift</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Architecture</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Architecture</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#end-to-end-workflow">End-to-end workflow</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#ingestion-preparation">1. Ingestion &amp; preparation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#ocr-text-reconstruction">2. OCR &amp; text reconstruction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#candidate-detection">3. Candidate detection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#policy-enforcement-confirmation">4. Policy enforcement &amp; confirmation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#alignment-rendering">5. Alignment &amp; rendering</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#outputs-observability">6. Outputs &amp; observability</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
@@ -84,21 +95,113 @@
              
   <section id="architecture">
 <h1>Architecture<a class="headerlink" href="#architecture" title="Link to this heading"></a></h1>
-<p>The high-level architecture diagram below illustrates the offline pipeline.</p>
+<p>The latest diagram captures the full offline pipeline, including OCR
+debugging, policy enforcement, review artifacts, and observability hooks.</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">docs/architecture.mmd</span></code> contains the Mermaid source.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">docs/architecture.html</span></code> renders the diagram.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">docs/architecture.png</span></code> is the raster export used in the README.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">docs/architecture.html</span></code> is a stand-alone interactive rendering.</p></li>
 </ul>
-<p>You can open the HTML diagram directly if viewing the repo locally, or regenerate
-it via <code class="docutils literal notranslate"><span class="pre">scripts/render_diagram.sh</span></code>.</p>
+<p>Regenerate all formats with <code class="docutils literal notranslate"><span class="pre">scripts/render_diagram.sh</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./scripts/render_diagram.sh<span class="w"> </span>docs/architecture.mmd<span class="w"> </span>docs/architecture.png
+npx<span class="w"> </span>@mermaid-js/mermaid-cli@10.9.1<span class="w"> </span>-i<span class="w"> </span>docs/architecture.mmd<span class="w"> </span>-o<span class="w"> </span>docs/architecture.html<span class="w"> </span>-t<span class="w"> </span>neutral<span class="w"> </span>-b<span class="w"> </span>transparent<span class="w"> </span>-s<span class="w"> </span><span class="m">1</span>.25
+</pre></div>
+</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>When building the Sphinx docs, the HTML diagram is included as a downloadable
-artifact rather than embedded. Click the link below.</p>
+<p>Sphinx publishes the HTML diagram as a download to keep the page light. Use the
+link below when browsing the built docs.</p>
 </div>
 <ul class="simple">
 <li><p><a class="reference download internal" download="" href="_downloads/095b7d5b528b0eb4051d3819d9f1ebf3/architecture.html"><span class="xref download myst">Download architecture.html</span></a></p></li>
 </ul>
+<section id="end-to-end-workflow">
+<h2>End-to-end workflow<a class="headerlink" href="#end-to-end-workflow" title="Link to this heading"></a></h2>
+<section id="ingestion-preparation">
+<h3>1. Ingestion &amp; preparation<a class="headerlink" href="#ingestion-preparation" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Entry points</strong>: the CLI (<code class="docutils literal notranslate"><span class="pre">evanesco</span> <span class="pre">run</span></code>), the batch runner, and the Gradio UI
+share the same <code class="docutils literal notranslate"><span class="pre">RunConfig</span></code>. Policies can be selected by name (<code class="docutils literal notranslate"><span class="pre">gdpr</span></code>, <code class="docutils literal notranslate"><span class="pre">hipaa</span></code>,
+etc.) or supplied as YAML.</p></li>
+<li><p><strong>Rasterization</strong>: PDFs are rasterized via Poppler (<code class="docutils literal notranslate"><span class="pre">pdf2image</span></code>) with a
+PyMuPDF fallback. Directories of images bypass rasterization and stream into the
+pipeline in sorted order.</p></li>
+<li><p><strong>Page conditioning</strong>: configurable preprocessing (<code class="docutils literal notranslate"><span class="pre">preprocess</span></code>, <code class="docutils literal notranslate"><span class="pre">deskew</span></code>,
+<code class="docutils literal notranslate"><span class="pre">binarize</span></code>, <code class="docutils literal notranslate"><span class="pre">auto_psm</span></code>) is applied before Tesseract. These toggles are exposed
+in both the CLI and UI so hard scans can be tuned without code changes.</p></li>
+</ul>
+</section>
+<section id="ocr-text-reconstruction">
+<h3>2. OCR &amp; text reconstruction<a class="headerlink" href="#ocr-text-reconstruction" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Tesseract TSV</strong>: every page yields word-level bounding boxes and confidence
+scores. When <code class="docutils literal notranslate"><span class="pre">export_ocr_debug</span></code> is active (enabled by default for the CLI and
+UI), per-page TSV and text dumps are materialized under
+<code class="docutils literal notranslate"><span class="pre">artifacts/&lt;run&gt;.ocr.zip</span></code> plus <code class="docutils literal notranslate"><span class="pre">&lt;run&gt;.all_text.txt</span></code> for quick greps.</p></li>
+<li><p><strong>Plain-text stream</strong>: TSV rows are converted into a linear text stream so the
+detectors and LLM prompts work in character offsets rather than pixel space.</p></li>
+</ul>
+</section>
+<section id="candidate-detection">
+<h3>3. Candidate detection<a class="headerlink" href="#candidate-detection" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>spaCy NER</strong>: loaded per language (auto-selects on CLI when <code class="docutils literal notranslate"><span class="pre">--spacy-model</span> <span class="pre">auto</span></code>). Supports switching off entirely for LLM-only runs.</p></li>
+<li><p><strong>Regex detectors</strong>: deterministic patterns catch IDs like email, phone,
+IBAN, SSN, credit cards, etc. They always run when enabled in the config.</p></li>
+<li><p><strong>LLM NER (optional)</strong>: few-shot prompting via Ollama can supplement or
+replace spaCy. Chunking bounds (<code class="docutils literal notranslate"><span class="pre">llm_ner_chunk_chars</span></code>) keep context sizes under
+control for small models.</p></li>
+<li><p>The union of all detectors is stored on each page as <code class="docutils literal notranslate"><span class="pre">candidates</span></code>, including
+the detector source, character offsets, and extracted text snippet.</p></li>
+</ul>
+</section>
+<section id="policy-enforcement-confirmation">
+<h3>4. Policy enforcement &amp; confirmation<a class="headerlink" href="#policy-enforcement-confirmation" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Policies</strong>: the policy module narrows which categories require redaction.
+Built-ins include <code class="docutils literal notranslate"><span class="pre">default</span></code>, <code class="docutils literal notranslate"><span class="pre">gdpr</span></code>, <code class="docutils literal notranslate"><span class="pre">hipaa</span></code>, and <code class="docutils literal notranslate"><span class="pre">pci</span></code>. Custom YAML policies
+can toggle categories or force redaction for all spans.</p></li>
+<li><p><strong>Ollama confirmation (optional)</strong>: candidates are chunked into prompts that
+include detector context. The default confirmation model is <code class="docutils literal notranslate"><span class="pre">gpt-oss:20b</span></code>, but
+any local Ollama model works. Responses are parsed into <code class="docutils literal notranslate"><span class="pre">items[]</span></code> with category,
+decision, score, and explanation, then merged with the policy decision.</p></li>
+<li><p><strong>Deterministic mode</strong>: when <code class="docutils literal notranslate"><span class="pre">--no-use-llm</span></code> is passed, the pipeline simply
+inherits the detector outputs after policy filtering.</p></li>
+</ul>
+</section>
+<section id="alignment-rendering">
+<h3>5. Alignment &amp; rendering<a class="headerlink" href="#alignment-rendering" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Box alignment</strong>: final spans are re-mapped to OCR bounding boxes. Accepted
+and rejected spans are tracked separately so preview overlays can show the
+difference.</p></li>
+<li><p><strong>Rendering</strong>: redaction can operate in blackout mode or label mode (the
+<code class="docutils literal notranslate"><span class="pre">--mode</span> <span class="pre">label</span></code> CLI flag / UI toggle). Bounding boxes are optionally inflated by
+<code class="docutils literal notranslate"><span class="pre">box_inflation_px</span></code> for safety.</p></li>
+<li><p><strong>Preview overlays</strong>: when enabled (<code class="docutils literal notranslate"><span class="pre">generate_previews</span></code>), the pipeline writes
+PNG overlays that highlight approved boxes (green) and rejected candidates
+(red). These live under <code class="docutils literal notranslate"><span class="pre">&lt;run&gt;.previews/</span></code> next to the output PDF.</p></li>
+</ul>
+</section>
+<section id="outputs-observability">
+<h3>6. Outputs &amp; observability<a class="headerlink" href="#outputs-observability" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Primary outputs</strong>: redacted PDF (<code class="docutils literal notranslate"><span class="pre">img2pdf</span></code>), <code class="docutils literal notranslate"><span class="pre">&lt;output&gt;.meta.json</span></code>,
+<code class="docutils literal notranslate"><span class="pre">&lt;output&gt;.audit.json</span></code>, and optional review CSVs (candidates, boxes, and
+LLM-decisions) when the UI toggle or CLI automation uses the review helper.</p></li>
+<li><p><strong>LLM traces</strong>: enabling <code class="docutils literal notranslate"><span class="pre">explain_traces</span></code> drops one JSON per page with the full
+prompt/response to support audits.</p></li>
+<li><p><strong>Performance metrics</strong>: per-stage timings (<code class="docutils literal notranslate"><span class="pre">ocr</span></code>, <code class="docutils literal notranslate"><span class="pre">detect</span></code>, <code class="docutils literal notranslate"><span class="pre">llm</span></code>, <code class="docutils literal notranslate"><span class="pre">align</span></code>,
+<code class="docutils literal notranslate"><span class="pre">redact</span></code>, <code class="docutils literal notranslate"><span class="pre">total</span></code>) are captured on every page. The Gradio UI aggregates them to
+drive its Performance panel.</p></li>
+<li><p><strong>Logging</strong>: the pipeline emits structured JSON logs via <code class="docutils literal notranslate"><span class="pre">evanesco.logging</span></code> so
+orchestrators can ingest run-level metadata.</p></li>
+</ul>
+<p>The updated diagram (see above) mirrors this flow and explicitly calls out the
+review artifacts, LLM trace export, and policy enforcement so operators can see
+where each feature hooks into the run.</p>
+</section>
+</section>
 </section>
 
 

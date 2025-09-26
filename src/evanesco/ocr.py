@@ -10,6 +10,7 @@ Enhancements for difficult documents:
 """
 
 from typing import List, Dict, Any, Optional
+import logging
 from pdf2image import convert_from_path
 from pdf2image.exceptions import PDFInfoNotInstalledError
 import pytesseract
@@ -190,19 +191,43 @@ def image_ocr_tsv(
             output_type=pytesseract.Output.DATAFRAME,
         )
 
-    tsv = run(psm)
-    # Drop NaNs and reset
-    tsv = tsv.dropna(subset=["text"]).reset_index(drop=True)
-    # Auto-PSM retry: if too few tokens, re-run with alternates and pick best
-    if auto_psm and len(tsv) < 5:
-        best = tsv
-        best_len = len(tsv)
-        for alt in (6, 4, 11):
-            try:
-                alt_df = run(alt).dropna(subset=["text"]).reset_index(drop=True)
-                if len(alt_df) > best_len:
-                    best, best_len = alt_df, len(alt_df)
-            except Exception:
-                pass
-        tsv = best
-    return {"tsv": tsv}
+    def clean(df):
+        return df.dropna(subset=["text"]).reset_index(drop=True)
+
+    best_df = clean(run(psm))
+    best_len = len(best_df)
+    best_psm = psm
+
+    fallback_psms = []
+    if auto_psm:
+        fallback_psms.extend([6, 4, 11])
+    if psm != 3:
+        fallback_psms.append(3)
+
+    for alt in fallback_psms:
+        if alt == best_psm:
+            continue
+        try:
+            alt_df = clean(run(alt))
+            alt_len = len(alt_df)
+            if alt_len > best_len:
+                best_df, best_len, best_psm = alt_df, alt_len, alt
+        except Exception:
+            continue
+
+    if best_len == 0 and best_psm != 3:
+        try:
+            fallback_df = clean(run(3))
+            if len(fallback_df) > 0:
+                logging.warning(
+                    "Tesseract returned no tokens for PSM %s; "
+                    "falling back to PSM 3 (len=%s)",
+                    psm,
+                    len(fallback_df),
+                )
+                best_df, best_psm = fallback_df, 3
+        except Exception:
+            pass
+
+    joined_text = " ".join(str(val) for val in best_df["text"].tolist())
+    return {"tsv": best_df, "text": joined_text, "psm": best_psm}

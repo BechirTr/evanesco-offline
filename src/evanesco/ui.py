@@ -39,6 +39,7 @@ def _run_pipeline(
     llm_url: str,
     prompt_path: str | None,
     use_llm_ner: bool,
+    llm_ner_model: str,
     llm_ner_prompt: str | None,
     policy_dropdown: str | None,
     policy_custom: str | None,
@@ -54,8 +55,11 @@ def _run_pipeline(
     deskew_flag: bool,
     binarize_flag: bool,
     auto_psm_flag: bool,
+    export_ocr_debug: bool,
     progress: Any = None,
 ) -> Tuple[
+    str | None,
+    str | None,
     str | None,
     str | None,
     str | None,
@@ -141,6 +145,7 @@ def _run_pipeline(
         (policy_custom or "").strip() or (policy_dropdown or "").strip() or None
     )
     spacy_model = (spacy_model or "").strip()
+    llm_ner_model = (llm_ner_model or "").strip()
     cfg = RunConfig(
         lang=lang,
         psm=psm,
@@ -151,6 +156,7 @@ def _run_pipeline(
         use_llm=use_llm,
         use_llm_ner=use_llm_ner,
         llm_model=llm_model,
+        llm_ner_model=llm_ner_model or None,
         llm_url=llm_url,
         prompt_path=prompt_path or None,
         llm_ner_prompt_path=(llm_ner_prompt or None),
@@ -163,6 +169,7 @@ def _run_pipeline(
         auto_psm=auto_psm_flag,
         generate_previews=generate_previews,
         explain_traces=save_traces,
+        export_ocr_debug=export_ocr_debug,
     )
 
     try:
@@ -171,6 +178,7 @@ def _run_pipeline(
         out_meta.write_bytes(
             __import__("orjson").dumps(res, option=__import__("orjson").OPT_INDENT_2)
         )
+        debug_info = res.get("debug", {}) or {}
         pages = res.get("pages", [])
         total_boxes = sum(p.get("boxes_applied", 0) for p in pages)
         summary = {
@@ -273,11 +281,15 @@ def _run_pipeline(
                     )
             except Exception:
                 pass
+        ocr_tsv_path = debug_info.get("ocr_tsv_zip") if export_ocr_debug else None
+        ocr_text_path = debug_info.get("ocr_text") if export_ocr_debug else None
         return (
             str(out_pdf),
             str(out_meta),
             out_cand,
             out_boxes,
+            ocr_tsv_path,
+            ocr_text_path,
             summary,
             explain,
             {"previews": previews},
@@ -285,6 +297,8 @@ def _run_pipeline(
         )
     except Exception as e:
         return (
+            None,
+            None,
             None,
             None,
             None,
@@ -337,6 +351,9 @@ def build_interface():
                 use_llm_ner = gr.Checkbox(
                     value=False, label="Use LLM NER (few-shot instead of spaCy)"
                 )
+                llm_ner_model = gr.Textbox(
+                    value="gemma3:4b", label="LLM NER model"
+                )
                 llm_ner_prompt = gr.Textbox(value="", label="LLM NER prompt (optional)")
             with gr.Row():
                 policy = gr.Dropdown(
@@ -375,6 +392,11 @@ def build_interface():
                 deskew = gr.Checkbox(value=True, label="Deskew")
                 binarize = gr.Checkbox(value=True, label="Binarize")
                 auto_psm = gr.Checkbox(value=True, label="Auto-PSM retry")
+
+        with gr.Accordion("Debugging", open=False):
+            export_ocr_debug = gr.Checkbox(
+                value=False, label="Export OCR debug artifacts (TSV + text)"
+            )
         with gr.Accordion("Review & Artifacts", open=False):
             generate_review = gr.Checkbox(
                 value=True, label="Generate review CSVs (candidates, boxes, LLM items)"
@@ -394,6 +416,9 @@ def build_interface():
         with gr.Row():
             cand_out = gr.File(label="Candidates CSV", interactive=False)
             boxes_out = gr.File(label="Boxes CSV", interactive=False)
+        with gr.Row():
+            ocr_tsv = gr.File(label="OCR TSV", interactive=False)
+            ocr_text = gr.File(label="OCR Text", interactive=False)
         summary = gr.JSON(label="Summary")
         with gr.Accordion("LLM Explainability", open=False):
             explain_json = gr.JSON(label="LLM items (with why/score)")
@@ -437,6 +462,7 @@ def build_interface():
                 llm_url,
                 prompt_path,
                 use_llm_ner,
+                llm_ner_model,
                 llm_ner_prompt,
                 policy,
                 custom_policy,
@@ -450,6 +476,7 @@ def build_interface():
                 deskew,
                 binarize,
                 auto_psm,
+                export_ocr_debug,
                 generate_previews,
                 save_traces,
             ],
@@ -458,6 +485,8 @@ def build_interface():
                 out_meta,
                 cand_out,
                 boxes_out,
+                ocr_tsv,
+                ocr_text,
                 summary,
                 explain_json,
                 previews_json,

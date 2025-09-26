@@ -23,11 +23,15 @@ class JsonFormatter(logging.Formatter):
         return orjson.dumps(payload).decode("utf-8")
 
 
-def get_logger(name: str = "evanesco") -> logging.Logger:
+def get_logger(name: str = "evanesco", level: int = logging.INFO) -> logging.Logger:
     logger = logging.getLogger(name)
     if not logger.handlers:
         h = logging.StreamHandler()
         h.setFormatter(JsonFormatter())
         logger.addHandler(h)
-        logger.setLevel(logging.INFO)
+    logger.setLevel(level)
+    root = logging.getLogger()
+    if not root.handlers:
+        root.addHandler(logging.StreamHandler())
+    root.setLevel(level)
     return logger

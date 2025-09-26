@@ -3,8 +3,7 @@
 Graceful fallbacks:
 - Try the requested model name.
 - If unavailable, try ``en_core_web_sm``.
-- If still unavailable, fall back to ``spacy.blank('en')`` (no NER) and return
-  no entities so upstream logic can proceed deterministically.
+- If still unavailable, fall back to ``spacy.blank('en')`` (no NER) so upstream logic can proceed deterministically.
 
 This module exposes thin wrappers that return simple span dictionaries suitable
 for alignment with OCR word boxes.

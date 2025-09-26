@@ -34,7 +34,7 @@ def run(
     ),
     llm_model: str = typer.Option("gpt-oss:20b", help="Ollama model name"),
     llm_ner_model: Optional[str] = typer.Option(
-        None, help="Override model name for LLM NER"
+        "gemma3:4b", help="Override model name for LLM NER"
     ),
     prompt_path: Optional[str] = typer.Option(
         None, help="Path to prompts/pii_audit.jsonl"
@@ -42,6 +42,7 @@ def run(
     llm_ner_prompt: Optional[str] = typer.Option(
         None, help="Path to prompts/ner_fewshot.jsonl for LLM NER"
     ),
+    llm_timeout: int = typer.Option(120, help="LLM request timeout (seconds)"),
     policy: Optional[str] = typer.Option(
         None, help="Policy name or YAML path (e.g., default, gdpr, hipaa, pci)"
     ),
@@ -64,6 +65,10 @@ def run(
     auto_psm: bool = typer.Option(
         True, "--auto-psm/--no-auto-psm", help="Auto retry PSM to maximize tokens"
     ),
+    export_ocr_debug: bool = typer.Option(
+        True, help="Export raw OCR TSV/text for debugging"
+    ),
+    workers: int = typer.Option(1, help="Concurrent page workers"),
 ):
     """Redact PII from PDFs or images and write a redacted PDF.
 
@@ -123,12 +128,20 @@ def run(
         deskew=deskew,
         binarize=binarize,
         auto_psm=auto_psm,
+        export_ocr_debug=export_ocr_debug,
+        workers=max(1, workers),
+        llm_timeout=llm_timeout,
     )
     res = process_path(input, output, cfg)
     meta_path = Path(output).with_suffix(".meta.json")
     meta_path.write_bytes(orjson.dumps(res, option=orjson.OPT_INDENT_2))
     print(f"[green]Redacted PDF:[/green] {output}")
     print(f"[green]Details:[/green] {str(meta_path)}")
+    debug_info = res.get("debug", {}) or {}
+    if debug_info.get("ocr_tsv_zip"):
+        print(f"[cyan]OCR debug archive:[/cyan] {debug_info['ocr_tsv_zip']}")
+    if debug_info.get("ocr_text"):
+        print(f"[cyan]OCR combined text:[/cyan] {debug_info['ocr_text']}")
 
 
 @app.command()
@@ -211,7 +224,7 @@ def batch(
     ),
     llm_model: str = typer.Option("gpt-oss:20b", help="Ollama model name"),
     llm_ner_model: Optional[str] = typer.Option(
-        None, help="Override model name for LLM NER"
+        "llama3.2:1b", help="Override model name for LLM NER"
     ),
     prompt_path: Optional[str] = typer.Option(
         None, help="Path to prompts/pii_audit.jsonl"
@@ -219,6 +232,7 @@ def batch(
     llm_ner_prompt: Optional[str] = typer.Option(
         None, help="Path to prompts/ner_fewshot.jsonl for LLM NER"
     ),
+    llm_timeout: int = typer.Option(120, help="LLM request timeout (seconds)"),
     policy: Optional[str] = typer.Option(None, help="Policy name or YAML path"),
     dpi: int = typer.Option(400, help="Rasterization DPI for PDFs"),
     psm: int = typer.Option(3, help="Tesseract PSM"),
@@ -238,6 +252,9 @@ def batch(
     ),
     auto_psm: bool = typer.Option(
         True, "--auto-psm/--no-auto-psm", help="Auto retry PSM to maximize tokens"
+    ),
+    export_ocr_debug: bool = typer.Option(
+        False, help="Export raw OCR TSV/text for debugging"
     ),
 ):
     """Batch process multiple inputs concurrently."""
@@ -293,6 +310,8 @@ def batch(
         deskew=deskew,
         binarize=binarize,
         auto_psm=auto_psm,
+        export_ocr_debug=export_ocr_debug,
+        llm_timeout=llm_timeout,
     )
     pairs = run_batch(files, output_dir, cfg, workers=workers)
     print(f"[green]Completed {len(pairs)} files[/green]")
