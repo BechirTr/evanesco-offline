@@ -4,6 +4,7 @@ set -euo pipefail
 SRC=${1:-docs/architecture.mmd}
 OUT=${2:-docs/architecture.png}
 EXECUTABLE=${3:-}
+SCALE=${MERMAID_SCALE:-2.5}
 
 # Try to detect a local Chrome/Chromium if not explicitly provided
 detect_browser() {
@@ -37,13 +38,13 @@ fi
 
 if command -v mmdc >/dev/null 2>&1; then
   echo "Using mmdc from PATH"
-  mmdc -i "$SRC" -o "$OUT" -t neutral -b transparent -s 1.25
+  mmdc -i "$SRC" -o "$OUT" -t neutral -b transparent -s "$SCALE"
   exit 0
 fi
 
 if command -v npx >/dev/null 2>&1; then
   echo "Using npx to run mermaid-cli"
-  npx --yes @mermaid-js/mermaid-cli@10.9.1 -i "$SRC" -o "$OUT" -t neutral -b transparent -s 1.25
+  npx --yes @mermaid-js/mermaid-cli@10.9.1 -i "$SRC" -o "$OUT" -t neutral -b transparent -s "$SCALE"
   exit 0
 fi
 

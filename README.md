@@ -55,6 +55,10 @@ The anonymization run goes through deterministic stages so you can reason about 
 
 The new `--export-ocr-debug` flag (also surfaced in the UI) drops `<output>.ocr.zip` and `<output>.all_text.txt` into `artifacts/` so you can inspect raw OCR tokens without digging through temp folders.
 
+## Architecture
+
+![Pipeline architecture](img/architecture.png)
+
 ## Visual Example
 
 Real documents rarely fit into contrived samples. Below is a real-world page run through Evanesco, with the left panel showing the original scan and the right panel presenting the redacted output.

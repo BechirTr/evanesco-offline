@@ -4,7 +4,6 @@ This module wires together OCR, detection (spaCy and regex), optional LLM
 confirmation via Ollama, geometric alignment and final redaction.
 """
 
-
 from typing import Optional, List, Dict, Any, Tuple
 from importlib import resources
 from functools import lru_cache
@@ -27,6 +26,7 @@ from .audit import write_audit
 import mimetypes
 
 from evanesco.logging import get_logger
+
 logger = get_logger("evanesco")
 
 NER_PROMPT_FILENAME = "ner_fewshot.jsonl"
@@ -70,7 +70,9 @@ def _search_repo_prompt(filename: str) -> Optional[str]:
     return None
 
 
-def _load_prompt(explicit_path: Optional[str], packaged_filename: str, fallback: str) -> str:
+def _load_prompt(
+    explicit_path: Optional[str], packaged_filename: str, fallback: str
+) -> str:
     if explicit_path:
         pp = Path(explicit_path)
         if pp.exists():
@@ -262,8 +264,8 @@ def _normalize_llm_items(
 
     for raw in raw_items:
         try:
-            start = int(raw.get("start")) # pyright: ignore[reportArgumentType]
-            end = int(raw.get("end")) # pyright: ignore[reportArgumentType]
+            start = int(raw.get("start"))  # pyright: ignore[reportArgumentType]
+            end = int(raw.get("end"))  # pyright: ignore[reportArgumentType]
         except Exception:
             continue
         if start >= end:
@@ -273,7 +275,9 @@ def _normalize_llm_items(
         text = raw.get("text") or cand.get("text")
         if text is None:
             continue
-        category = (raw.get("category") or raw.get("label") or cand.get("label") or "OTHER").upper()
+        category = (
+            raw.get("category") or raw.get("label") or cand.get("label") or "OTHER"
+        ).upper()
         redact = bool(raw.get("redact", True))
         why = raw.get("why") or ""
         score = raw.get("score")
@@ -411,14 +415,14 @@ def llm_ner_candidates(text: str, cfg: RunConfig) -> List[Dict[str, Any]]:
         }
         full = f"{prompt}\n\nUSER:\n{json.dumps(local_user)}"
         resp = client.generate(full, model=model, timeout=cfg.llm_timeout)
-        #logger.info(f"LLM RESP: {resp}")
+        # logger.info(f"LLM RESP: {resp}")
         try:
             js = json.loads(resp)
         except Exception:
             js = resp
-        #logger.info(f"LLM PARSED: {js}")
+        # logger.info(f"LLM PARSED: {js}")
         items = _normalize_items(js)
-        #logger.info(f"LLM items parsed: {items}")
+        # logger.info(f"LLM items parsed: {items}")
         chunk_out: List[Dict[str, Any]] = []
         for it in items:
             if isinstance(it, str):
@@ -434,7 +438,11 @@ def llm_ner_candidates(text: str, cfg: RunConfig) -> List[Dict[str, Any]]:
             label = (it.get("label") or "OTHER").upper()
             if text_val is None:
                 continue
-            if not isinstance(s, int) or not isinstance(e, int) or not (0 <= s < e <= len(segment)):
+            if (
+                not isinstance(s, int)
+                or not isinstance(e, int)
+                or not (0 <= s < e <= len(segment))
+            ):
                 idx = segment.find(text_val)
                 if idx < 0:
                     continue
@@ -450,7 +458,7 @@ def llm_ner_candidates(text: str, cfg: RunConfig) -> List[Dict[str, Any]]:
                     "response": resp,
                 }
             )
-            #logger.info(f"LLM NER chunk item: {chunk_out[-1]}")
+            # logger.info(f"LLM NER chunk item: {chunk_out[-1]}")
         return chunk_out
 
     all_results: List[Dict[str, Any]] = []
@@ -464,7 +472,7 @@ def llm_ner_candidates(text: str, cfg: RunConfig) -> List[Dict[str, Any]]:
         if key not in seen:
             seen.add(key)
             uniq.append(c)
-    #logger.info(f"LLM uniq: {uniq}")
+    # logger.info(f"LLM uniq: {uniq}")
     return uniq
 
 
@@ -634,7 +642,7 @@ def _process_images(
         )
         tsv = ocr_res["tsv"]
         ocr_meta = {k: v for k, v in ocr_res.items() if k != "tsv"}
-        #logger.info("OCR completed: {} words, {} chars".format(len(tsv), sum(len(str(x)) for x in tsv["text"])))
+        # logger.info("OCR completed: {} words, {} chars".format(len(tsv), sum(len(str(x)) for x in tsv["text"])))
         # #logger.info(f"debug directory: {ocr_debug_dir}")
         if cfg.export_ocr_debug and ocr_debug_dir is not None:
             raw_path = ocr_debug_dir / f"page_{idx:04d}_words.tsv"
@@ -650,7 +658,7 @@ def _process_images(
                 all_texts[idx] = text_content
                 # #logger.info(f"OCR debug for page {idx} at {raw_path} and {text_path}")
             except Exception as e:
-                #logger.info(f"Failed to export OCR debug files error {e}", exc_info=True)
+                # logger.info(f"Failed to export OCR debug files error {e}", exc_info=True)
                 pass
         t_ocr = time.perf_counter()
         page_text = ocr_meta.get("text") or _page_text_from_tsv(tsv)
@@ -790,7 +798,7 @@ def _process_images(
                 # #logger.info(f"All page text at {text_dest}")
             # #logger.info(f"OCR debug ZIP at {zip_dest}")
         except Exception as e:
-            #logger.info(f"Failed to export OCR debug ZIP with exception {e}", exc_info=True)
+            # logger.info(f"Failed to export OCR debug ZIP with exception {e}", exc_info=True)
             pass
     save_pdf([img for img in redacted_imgs if img is not None], output_path)
     return {"pages": results, "out": output_path, "debug": debug_payload}

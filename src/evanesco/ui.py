@@ -351,9 +351,7 @@ def build_interface():
                 use_llm_ner = gr.Checkbox(
                     value=False, label="Use LLM NER (few-shot instead of spaCy)"
                 )
-                llm_ner_model = gr.Textbox(
-                    value="gemma3:4b", label="LLM NER model"
-                )
+                llm_ner_model = gr.Textbox(value="gemma3:4b", label="LLM NER model")
                 llm_ner_prompt = gr.Textbox(value="", label="LLM NER prompt (optional)")
             with gr.Row():
                 policy = gr.Dropdown(

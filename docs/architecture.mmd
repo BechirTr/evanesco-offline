@@ -1,81 +1,81 @@
-graph TD
+flowchart TD
   %% Styles
   classDef external fill:#f3f3f3,stroke:#888,color:#222
   classDef action fill:#e8f1ff,stroke:#4a90e2,color:#111
   classDef store fill:#fff1e0,stroke:#e67e22,color:#333
 
 %% Entry points
-Entry[CLI / UI / API]:::external --> Config[RunConfig + Policy]:::store;
-Entry --> Source[Input Documents]:::store;
+Entry[CLI / UI / API]:::external --> Config[RunConfig + Policy]:::store
+Entry --> Source[Input Documents]:::store
 
 %% Pipeline flow
 
 subgraph Ingestion
-  Source -->|PDF| Rasterize[Poppler / PyMuPDF Rasterize]:::action;
-  Source -->|Images or Dir| Pages[Page Images]:::store;
-  Rasterize --> Pages;
-  Config --> Preprocess[Enhance / Deskew / Binarize]:::action;
-  Pages --> Preprocess;
-  Preprocess --> OCR[Tesseract OCR -> TSV]:::action;
+  Source -->|PDF| Rasterize[Poppler / PyMuPDF Rasterize]:::action
+  Source -->|Images or Dir| Pages[Page Images]:::store
+  Rasterize --> Pages
+  Config --> Preprocess[Enhance / Deskew / Binarize]:::action
+  Pages --> Preprocess
+  Preprocess --> OCR[Tesseract OCR -> TSV]:::action
 end
 
-OCR --> TextStream[Reconstructed Text Stream]:::store;
-OCR --> DebugExport[OCR Debug Export]:::action;
-DebugExport --> OcrArtifacts[artifacts/<run>.ocr.zip + all_text.txt]:::store;
+OCR --> TextStream[Reconstructed Text Stream]:::store
+OCR --> DebugExport[OCR Debug Export]:::action
+DebugExport --> OcrArtifacts[artifacts/run.ocr.zip + all_text.txt]:::store
 
 subgraph Detection
-  TextStream --> Spa[spaCy NER]:::action;
-  TextStream --> Regex[Regex Rules]:::action;
-  TextStream -->|optional| LLMNER[LLM Few-shot NER]:::action;
-  Spa --> Candidates[Candidate Spans]:::store;
-  Regex --> Candidates;
-  LLMNER --> Candidates;
+  TextStream --> Spa[spaCy NER]:::action
+  TextStream --> Regex[Regex Rules]:::action
+  TextStream -->|optional| LLMNER[LLM Few-shot NER]:::action
+  Spa --> Candidates[Candidate Spans]:::store
+  Regex --> Candidates
+  LLMNER --> Candidates
 end
 
 subgraph PolicyConfirmation [Policy & Confirmation]
-  Candidates --> PolicyFilter[Policy Filter]:::action;
-  Config --> PolicyFilter;
-  PolicyFilter --> Prompt[Prompt Builder]:::action;
-  Prompt -->|optional| ConfirmLLM[Ollama Confirmation]:::action;
-  ConfirmLLM --> Decisions[LLM Decisions]:::store;
-  PolicyFilter --> Deterministic[Deterministic Approvals]:::store;
-  Decisions --> Deterministic;
+  Candidates --> PolicyFilter[Policy Filter]:::action
+  Config --> PolicyFilter
+  PolicyFilter --> Prompt[Prompt Builder]:::action
+  Prompt -->|optional| ConfirmLLM[Ollama Confirmation]:::action
+  ConfirmLLM --> Decisions[LLM Decisions]:::store
+  PolicyFilter --> Deterministic[Deterministic Approvals]:::store
+  Decisions --> Deterministic
 end
 
 subgraph AlignmentRendering [Alignment & Rendering]
-  OCR --> Align[Align Spans to OCR Boxes]:::action;
-  Deterministic --> Align;
-  Align --> Boxes[Accepted Boxes]:::store;
-  Candidates --> Rejected[Rejected Spans]:::store;
-  Align --> RejectedBoxes[Rejected Boxes]:::store;
-  Config --> RenderMode[Render Mode - blackout or label]:::action;
-  RenderMode --> Render[Render Redactions]:::action;
-  Boxes --> Render;
-  Render --> RedPages[Redacted Page Images]:::store;
-  Render --> Previews[Preview Overlays]:::store;
+  OCR --> Align[Align Spans to OCR Boxes]:::action
+  Deterministic --> Align
+  Align --> Boxes[Accepted Boxes]:::store
+  Candidates --> Rejected[Rejected Spans]:::store
+  Align --> RejectedBoxes[Rejected Boxes]:::store
+  Config --> RenderMode[Render Mode - blackout or label]:::action
+  RenderMode --> Render[Render Redactions]:::action
+  Boxes --> Render
+  Render --> RedPages[Redacted Page Images]:::store
+  Render --> Previews[Preview Overlays]:::store
 end
 
-RedPages --> PdfTask[img2pdf Assembly]:::action;
-PdfTask --> OutputPdf[Redacted PDF]:::store;
-Previews --> PreviewDir[<run>.previews/]:::store;
+RedPages --> PdfTask[img2pdf Assembly]:::action
+PdfTask --> OutputPdf[Redacted PDF]:::store
+Previews --> PreviewDir[run.previews/]:::store
 
 subgraph Outputs
-  Deterministic --> Meta[<run>.meta.json]:::store;
-  Candidates --> ReviewCsv[Review CSVs]:::store;
-  Decisions --> Traces[Optional LLM Traces]:::store;
-  DebugExport --> OcrArtifacts;
-  Config --> AuditWriter[Audit Writer]:::action;
-  AuditWriter --> AuditJson[<run>.audit.json]:::store;
-  Meta --> Summary[Per-page Timings & Stats]:::store;
+  Deterministic --> Meta[run.meta.json]:::store
+  Candidates --> ReviewCsv[Review CSVs]:::store
+  Decisions --> Traces[Optional LLM Traces]:::store
+  DebugExport --> OcrArtifacts
+  Config --> AuditWriter[Audit Writer]:::action
+  AuditWriter --> AuditJson[run.audit.json]:::store
+  Meta --> Summary[Per-page Timings & Stats]:::store
 end
 
 subgraph ExternalDeps
-  Tess[Tesseract OCR]:::external;
-  PopplerSvc[Poppler / PyMuPDF]:::external;
-  Oll[Ollama Server]:::external;
+  Tess[Tesseract OCR]:::external
+  PopplerSvc[Poppler / PyMuPDF]:::external
+  Oll[Ollama Server]:::external
 end
 
-OCR --- Tess;
-Rasterize --- PopplerSvc;
-ConfirmLLM --- Oll;
-LLMNER --- Oll;
+OCR --- Tess
+Rasterize --- PopplerSvc
+ConfirmLLM --- Oll
+LLMNER --- Oll
