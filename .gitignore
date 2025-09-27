@@ -1,5 +1,13 @@
 # Python cache
 __pycache__/
+**/__pycache__/
+**/__pycache__/
+**/pycahe/
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+**/cache/
 *.py[cod]
 
 # Virtual environments
@@ -21,3 +29,4 @@ configs/local.yaml
 
 # Docs build
 /docs/_build/
+
