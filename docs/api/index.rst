@@ -1,6 +1,11 @@
 API Reference
 =============
 
+.. toctree::
+   :maxdepth: 1
+
+   core
+
 .. autosummary::
    :toctree: _autosummary
    :recursive:
@@ -17,7 +22,7 @@ API Reference
    evanesco.cli
    evanesco.ui
    evanesco.api
-    evanesco.batch
-    evanesco.policy
-    evanesco.audit
-    evanesco.logging
+   evanesco.batch
+   evanesco.policy
+   evanesco.audit
+   evanesco.logging

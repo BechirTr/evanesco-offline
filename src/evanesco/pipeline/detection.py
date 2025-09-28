@@ -13,7 +13,9 @@ from .config import RunConfig
 from .llm_confirmation import llm_filter
 from .llm_ner import llm_ner_candidates
 from evanesco.logging import get_logger
+
 logger = get_logger(__name__)
+
 
 def detect_candidates(text: str, cfg: RunConfig) -> List[Dict[str, Any]]:
     """Run configured detectors and return unique span candidates."""
