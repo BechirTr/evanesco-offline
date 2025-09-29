@@ -1,7 +1,6 @@
 # Python cache
-__pycache__/
-**/__pycache__/
-**/__pycache__/
+__pycache__
+**/__pycache__
 **/pycahe/
 *.pyc
 *.pyo
@@ -30,3 +29,4 @@ configs/local.yaml
 # Docs build
 /docs/_build/
 presentation/
+src/evanesco/__pycache__

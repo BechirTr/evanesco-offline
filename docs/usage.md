@@ -161,15 +161,55 @@ pip install .[server]
 evanesco-api --host 0.0.0.0 --port 8000
 ```
 
-Call the endpoint:
+Once the server is running the interactive Swagger UI lives at
+`http://localhost:8000/docs` (ReDoc is exposed at `/redoc`). The API now models
+redaction as jobs so you can track inputs, outputs, and status transitions.
+
+Create a job that reads a local file path and writes the redacted PDF to the
+default `artifacts/redactions/` directory. Adjust the payload to toggle
+detectors or policy paths:
 
 ```
-curl -F "file=@data/in/pii_basic.pdf" -o redacted.pdf \
-  -F "policy=default" -F "mode=redact" \
-  http://localhost:8000/redact
+curl -X POST http://localhost:8000/jobs \
+  -H "Content-Type: application/json" \
+  -d '{
+        "input_path": "data/in/pii_basic.pdf",
+        "options": {
+          "use_spacy": true,
+          "use_llm": false,
+          "policy_path": "configs/default.yaml"
+        }
+      }'
 ```
 
-Prometheus metrics are available at `/metrics` when `prometheus-client` is installed.
+Each response contains a job identifier. Inspect and download artefacts via the
+CRUD endpoints:
+
+```
+# List jobs
+curl http://localhost:8000/jobs
+
+# Inspect a single job
+curl http://localhost:8000/jobs/<job-id>
+
+# Download the redacted PDF once the job status is "completed"
+curl -L http://localhost:8000/jobs/<job-id>/download -o redacted.pdf
+```
+
+For browser uploads (or when paths are inconvenient) submit a multipart request
+to the `/jobs/upload` endpoint. Optional redaction settings are supplied as a
+JSON document in the `options` field:
+
+```
+curl -X POST http://localhost:8000/jobs/upload \
+  -F "file=@data/in/pii_basic.pdf" \
+  -F "options={\"use_spacy\":true,\"use_llm\":false}"
+```
+
+The legacy `/redact` endpoint is still available but simply forwards to
+`/jobs/upload`; plan to migrate clients to the jobs workflow.
+
+Prometheus metrics remain exposed at `/metrics` when `prometheus-client` is installed.
 
 ## LLM Explainability
 

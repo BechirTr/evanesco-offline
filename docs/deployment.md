@@ -27,7 +27,7 @@ The API reads configuration from environment variables; the ConfigMap template
 
 | Variable | Purpose |
 | --- | --- |
-| `EVANESCO_API_TOKEN` | Bearer token required for `/redact` requests. Stored in a Kubernetes Secret. |
+| `EVANESCO_API_TOKEN` | Bearer token required for all `/jobs` endpoints (and the legacy `/redact`). Store in a Kubernetes Secret. |
 | `EVANESCO_API_CORS_ORIGINS` | Comma separated allow-list for browsers (e.g. the UI front-end). |
 | `EVANESCO_READY_CHECK_*` | Enable readiness validation for OCR, spaCy, or LLM dependencies. |
 | `EVANESCO_READY_SPACY_MODEL` | Model name used during readiness probing (`en_core_web_lg` by default). |
