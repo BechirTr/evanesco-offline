@@ -267,7 +267,8 @@ def require_auth(
         return
     if credentials is None or credentials.credentials != token:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized",
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorized",
         )
 
 
@@ -276,7 +277,9 @@ def _increment_metric(route: str) -> None:
         REQUESTS.labels(route=route).inc()  # type: ignore
 
 
-def _resolve_output_path(input_path: str, job_id: str, explicit_output: Optional[str]) -> str:
+def _resolve_output_path(
+    input_path: str, job_id: str, explicit_output: Optional[str]
+) -> str:
     if explicit_output:
         output = Path(explicit_output)
     else:
@@ -313,9 +316,13 @@ def _execute_job(
     options = payload.options or RedactionOptions()
     input_path = Path(payload.input_path)
     if not input_path.exists():
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Input path not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Input path not found"
+        )
 
-    output_path = _resolve_output_path(str(input_path), resolved_job_id, payload.output_path)
+    output_path = _resolve_output_path(
+        str(input_path), resolved_job_id, payload.output_path
+    )
     job = RedactionJob(
         id=resolved_job_id,
         input_path=str(input_path),
@@ -363,7 +370,9 @@ def _get_job_or_404(job_id: str) -> RedactionJob:
     try:
         return job_repository.get(job_id)
     except JobNotFoundError:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Job not found"
+        )
 
 
 @health_router.get("/health", response_model=HealthResponse)
@@ -404,7 +413,9 @@ def readyz():
     return JSONResponse(status_code=status_code, content=response.model_dump())
 
 
-@redaction_router.post("", response_model=RedactionJob, status_code=status.HTTP_201_CREATED)
+@redaction_router.post(
+    "", response_model=RedactionJob, status_code=status.HTTP_201_CREATED
+)
 def create_job(
     payload: RedactionJobCreate,
     auth: None = Depends(require_auth),
@@ -456,14 +467,21 @@ def delete_job(job_id: str, auth: None = Depends(require_auth)) -> Response:
 def download_job(job_id: str, auth: None = Depends(require_auth)) -> FileResponse:
     job = _get_job_or_404(job_id)
     if not job.result:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No redacted output available")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="No redacted output available"
+        )
     path = Path(job.result.output_path)
     if not path.exists():
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Redacted file missing on disk")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Redacted file missing on disk",
+        )
     return FileResponse(str(path), media_type="application/pdf", filename=path.name)
 
 
-@redaction_router.post("/upload", response_model=RedactionJob, status_code=status.HTTP_201_CREATED)
+@redaction_router.post(
+    "/upload", response_model=RedactionJob, status_code=status.HTTP_201_CREATED
+)
 async def create_job_from_upload(
     file: UploadFile = File(...),
     options: Optional[str] = Form(
@@ -489,7 +507,7 @@ async def create_job_from_upload(
         except json.JSONDecodeError as exc:
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail="`options` must be valid JSON (e.g. {\"use_llm\": false})",
+                detail='`options` must be valid JSON (e.g. {"use_llm": false})',
             ) from exc
 
     job_id = uuid4().hex
